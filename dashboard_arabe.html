@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace des Formes Triconsonantiques Arabes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=IBM+Plex+Mono:wght@300;400;600&display=swap');
+
+  :root {
+    --bg:       #070b10;
+    --bg2:      #0d1520;
+    --bg3:      #111c2c;
+    --border:   #1e3050;
+    --gold:     #c9a84c;
+    --gold2:    #f0d080;
+    --blue:     #4a9eff;
+    --cyan:     #2dd4bf;
+    --red:      #e63946;
+    --orange:   #f4a261;
+    --green:    #22c55e;
+    --purple:   #a78bfa;
+    --text:     #d0dcea;
+    --muted:    #5a7a99;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #070b10 0%, #0a1520 40%, #0d1e35 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(74,158,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-arabic {
+    font-size: 2.6rem;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .header-sub {
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .header-kpis {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  .kpi {
+    background: rgba(74,158,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    min-width: 130px;
+  }
+  .kpi-val { font-size: 1.25rem; color: var(--gold2); font-weight: 600; }
+  .kpi-lbl { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 2px; }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; gap: 0; overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 22px;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── PANELS ── */
+  .panel { display: none; padding: 32px 40px; }
+  .panel.active { display: block; }
+
+  .charts-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .charts-grid-1 { display: grid; grid-template-columns: 1fr; gap: 28px; max-width: 900px; margin: auto; }
+  .charts-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+  .chart-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .chart-card.wide { grid-column: 1 / -1; }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.82rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .chart-wrap { position: relative; height: 320px; }
+  .chart-wrap.tall { height: 420px; }
+  .chart-wrap.short { height: 240px; }
+
+  /* ── HEATMAP ── */
+  .heatmap-container { overflow-x: auto; margin-top: 8px; }
+  table.heatmap {
+    border-collapse: collapse;
+    font-size: 0.65rem;
+    width: 100%;
+  }
+  table.heatmap th {
+    color: var(--muted); font-weight: 400;
+    padding: 4px 6px; text-align: center;
+  }
+  table.heatmap td {
+    width: 54px; height: 44px;
+    text-align: center; font-size: 0.68rem;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 3px;
+    transition: transform 0.15s;
+    cursor: default;
+  }
+  table.heatmap td:hover { transform: scale(1.12); z-index: 2; position: relative; }
+
+  /* ── INSIGHT BOX ── */
+  .insight {
+    background: rgba(201,168,76,0.06);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 16px;
+    font-size: 0.7rem;
+    color: #b0c4de;
+    margin-top: 14px;
+    line-height: 1.6;
+  }
+  .insight b { color: var(--gold2); }
+
+  /* ── KPI TABLE ── */
+  .kpi-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  .kpi-table tr { border-bottom: 1px solid var(--border); }
+  .kpi-table td { padding: 10px 14px; }
+  .kpi-table td:first-child { color: var(--muted); }
+  .kpi-table td:last-child { color: var(--gold2); font-weight: 600; text-align: right; }
+  .kpi-table tr:hover td { background: rgba(74,158,255,0.04); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-arabic">الجذور الثلاثية العربية</div>
+  <div class="header-sub">Espace des Formes Triconsonantiques · Analyse Mathématique & Fractale</div>
+  <div class="header-kpis">
+    <div class="kpi"><div class="kpi-val">21 952</div><div class="kpi-lbl">Espace théorique</div></div>
+    <div class="kpi"><div class="kpi-val">16 450</div><div class="kpi-lbl">Formes valides</div></div>
+    <div class="kpi"><div class="kpi-val">74.9%</div><div class="kpi-lbl">Taux de validité</div></div>
+    <div class="kpi"><div class="kpi-val">64 466</div><div class="kpi-lbl">Arêtes du graphe</div></div>
+    <div class="kpi"><div class="kpi-val">D=0.372</div><div class="kpi-lbl">Dim. fractale</div></div>
+    <div class="kpi"><div class="kpi-val">100%</div><div class="kpi-lbl">Connexité</div></div>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="tab active" onclick="showTab('contraintes')">① Contraintes</div>
+  <div class="tab" onclick="showTab('structure')">② Structure</div>
+  <div class="tab" onclick="showTab('topologie')">③ Topologie</div>
+  <div class="tab" onclick="showTab('fractale')">④ Fractale</div>
+  <div class="tab" onclick="showTab('synthese')">⑤ Synthèse</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PANEL 1 : CONTRAINTES
+══════════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-contraintes">
+  <div class="charts-grid-2">
+
+    <!-- G1 : Zones vides par contrainte -->
+    <div class="chart-card">
+      <div class="card-title">① Zones vides par type de contrainte</div>
+      <div class="card-desc">Répartition des 5 502 formes phonologiquement interdites selon la règle violée</div>
+      <div class="chart-wrap"><canvas id="c1"></canvas></div>
+      <div class="insight"><b>41%</b> des rejets proviennent de l'incompatibilité <b>homorganique</b> (deux obstruantes de même lieu d'articulation adjacentes)</div>
+    </div>
+
+    <!-- G2 : Barres horizontales contraintes -->
+    <div class="chart-card">
+      <div class="card-title">② Volume des formes interdites par règle</div>
+      <div class="card-desc">Nombre absolu de trigrammes rejetés par chaque contrainte phonologique</div>
+      <div class="chart-wrap"><canvas id="c2"></canvas></div>
+      <div class="insight">L'OCP (principe du contour obligatoire) à lui seul élimine <b>784 combinaisons</b> — soit 14% de toutes les zones vides</div>
+    </div>
+
+    <!-- G3 : Camembert types de racines -->
+    <div class="chart-card">
+      <div class="card-title">③ Catégories de racines valides</div>
+      <div class="card-desc">Classification des 16 450 formes valides selon leurs propriétés phonologiques</div>
+      <div class="chart-wrap"><canvas id="c3"></canvas></div>
+      <div class="insight">Les racines <b>gutturales</b> (ع ح ه ء) dominent avec 6 004 formes — elles bénéficient de règles de cooccurrence moins restrictives</div>
+    </div>
+
+    <!-- G4 : Obstruante vs Sonante par position -->
+    <div class="chart-card">
+      <div class="card-title">④ Classe (obstruante / sonante) par position</div>
+      <div class="card-desc">Distribution des deux grandes classes consonantiques en C1, C2, C3</div>
+      <div class="chart-wrap"><canvas id="c4"></canvas></div>
+      <div class="insight">C2 est la position la plus <b>perméable aux sonantes</b> (4 824 vs 4 504 en C1) — rôle médian plus flexible</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PANEL 2 : STRUCTURE
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-structure">
+  <div class="charts-grid-2">
+
+    <!-- G5 : Distribution des degrés -->
+    <div class="chart-card">
+      <div class="card-title">⑤ Distribution des degrés du graphe de voisinage</div>
+      <div class="card-desc">Nb de racines selon leur nombre de voisins phonétiquement proches (seuil dist ≤ 1.5)</div>
+      <div class="chart-wrap tall"><canvas id="c5"></canvas></div>
+      <div class="insight">Distribution quasi-normale centrée sur <b>degré 8</b> — l'espace est homogène, sans nœuds hyper-connectés ni isolés</div>
+    </div>
+
+    <!-- G6 : Lieu d'articulation par position -->
+    <div class="chart-card">
+      <div class="card-title">⑥ Fréquence des lieux d'articulation par position</div>
+      <div class="card-desc">Répartition des 9 lieux articulatoires en C1, C2, C3 (formes valides)</div>
+      <div class="chart-wrap tall"><canvas id="c6"></canvas></div>
+      <div class="insight">Les consonnes <b>alvéolaires</b> (س ز ص ن ل ر) dominent toutes les positions — le centre articulatoire est le plus productif</div>
+    </div>
+
+    <!-- G7 : Mode articulatoire par position -->
+    <div class="chart-card wide">
+      <div class="card-title">⑦ Mode articulatoire par position C1 / C2 / C3</div>
+      <div class="card-desc">Répartition des modes (occlusive, fricative, nasale, etc.) selon la position dans la racine</div>
+      <div class="chart-wrap"><canvas id="c7"></canvas></div>
+      <div class="insight">Les <b>fricatives</b> sont systématiquement le mode le plus fréquent (~44% par position), suivies des occlusives (~27%) — symétrie remarquable entre C1 et C3</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PANEL 3 : TOPOLOGIE
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-topologie">
+  <div class="charts-grid-2">
+
+    <!-- G8 : Histogramme densité locale -->
+    <div class="chart-card">
+      <div class="card-title">⑧ Distribution de la densité locale</div>
+      <div class="card-desc">Pour chaque racine valide : combien de ses 81 voisins par substitution sont aussi valides ?</div>
+      <div class="chart-wrap tall"><canvas id="c8"></canvas></div>
+      <div class="insight">Densité moyenne <b>68.35/81</b> (84.4%) — l'espace est très dense. Forme quasi-gaussienne → pas de sous-espace anormalement isolé</div>
+    </div>
+
+    <!-- G9 : Heatmap C1×C3 -->
+    <div class="chart-card">
+      <div class="card-title">⑨ Heatmap densité C1 × C3</div>
+      <div class="card-desc">Taux de remplissage selon le lieu d'articulation de C1 (lignes) et C3 (colonnes)</div>
+      <div class="heatmap-container" id="heatmap-container"></div>
+      <div class="insight">Zone la plus <b>vide</b> : pharyngale × glottale (0.375) — consonnes du fond de la gorge incompatibles. Zone la plus <b>dense</b> : labiale × labiale (0.964)</div>
+    </div>
+
+    <!-- G10 : Entropie de Shannon -->
+    <div class="chart-card wide">
+      <div class="card-title">⑩ Entropie de Shannon par position</div>
+      <div class="card-desc">Mesure de l'uniformité de distribution des consonnes en C1, C2, C3 — max théorique = log₂(28) = 4.807 bits</div>
+      <div class="chart-wrap short"><canvas id="c10"></canvas></div>
+      <div class="insight">
+        C1 = <b>4.787</b> bits (99.6% du max) · C2 = <b>4.766</b> bits (99.1%) · C3 = <b>4.784</b> bits (99.5%)<br>
+        L'espace est <b>quasi-uniformément distribué</b> — aucune position ne favorise structurellement une consonne
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PANEL 4 : FRACTALE
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-fractale">
+  <div class="charts-grid-2">
+
+    <!-- G11 : Box-counting log-log -->
+    <div class="chart-card">
+      <div class="card-title">⑪ Box-counting — Régression log(N) / log(ε)</div>
+      <div class="card-desc">Méthode de comptage de boîtes sur l'espace projeté en 3D (PCA). La pente = dimension fractale D</div>
+      <div class="chart-wrap tall"><canvas id="c11"></canvas></div>
+      <div class="insight">Dimension fractale <b>D = 0.372</b> — bien inférieure à 3 (espace ambiant). Structure <b>lacunaire</b> confirmée : l'espace ressemble à une éponge de Menger</div>
+    </div>
+
+    <!-- G12 : Spectre multi-fractal D(q) -->
+    <div class="chart-card">
+      <div class="card-title">⑫ Spectre multi-fractal D(q)</div>
+      <div class="card-desc">Dimension généralisée d'ordre q. D(0)=capacité, D(1)=entropie, D(2)=corrélation</div>
+      <div class="chart-wrap tall"><canvas id="c12"></canvas></div>
+      <div class="insight">Amplitude D(q) = <b>0.0037</b> (très faible) → espace <b>quasi-monofractal</b> : les contraintes phonologiques agissent de façon uniforme et régulière sur tout l'espace</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PANEL 5 : SYNTHÈSE
+══════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-synthese">
+  <div class="charts-grid-2">
+    <div class="chart-card">
+      <div class="card-title">Récapitulatif complet</div>
+      <div class="card-desc">Toutes les métriques clés de la recherche</div>
+      <table class="kpi-table">
+        <tr><td>Espace théorique brut</td><td>21 952</td></tr>
+        <tr><td>Formes phonologiquement valides</td><td>16 450 (74.9%)</td></tr>
+        <tr><td>Zones vides (formes interdites)</td><td>5 502 (25.1%)</td></tr>
+        <tr><td>Contrainte dominante</td><td>Homorganique adjacente</td></tr>
+        <tr><td>Nœuds du graphe de voisinage</td><td>16 450</td></tr>
+        <tr><td>Arêtes (paires proches)</td><td>64 466</td></tr>
+        <tr><td>Degré moyen</td><td>7.84 voisins / racine</td></tr>
+        <tr><td>Composantes connexes</td><td>1 — espace totalement connexe</td></tr>
+        <tr><td>Racines isolées</td><td>12</td></tr>
+        <tr><td>Densité locale moyenne</td><td>68.35 / 81 (84.4%)</td></tr>
+        <tr><td>Entropie C1 / C2 / C3</td><td>4.787 / 4.766 / 4.784 bits</td></tr>
+        <tr><td>Palindromes (C1 = C3)</td><td>600</td></tr>
+        <tr><td>Géminées (C2 = C3)</td><td>600</td></tr>
+        <tr><td>Racines faibles (w ou y)</td><td>3 860 (23.5%)</td></tr>
+        <tr><td>Dimension fractale D</td><td>0.3718 (espace lacunaire)</td></tr>
+        <tr><td>Amplitude multi-fractale</td><td>0.0037 (quasi-monofractal)</td></tr>
+        <tr><td>Ratio frontière / total</td><td>100% (éponge de Menger)</td></tr>
+        <tr><td>Auto-similarité (CV)</td><td>0.000 — parfaitement uniforme</td></tr>
+      </table>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">Conclusions principales</div>
+      <div class="card-desc">Interprétation scientifique des résultats</div>
+      <div style="font-size:0.72rem; line-height:1.9; color:#b0c4de;">
+        <p style="margin-bottom:12px;">
+          <span style="color:var(--gold)">◆ STRUCTURE PHONOLOGIQUE</span><br>
+          L'arabe utilise 74.9% de son espace combinatoire potentiel. Les 25.1% restants forment des zones vides structurées — non pas aléatoires — gouvernées par 6 contraintes hiérarchisées, la plus puissante étant la dissimilation homorganique.
+        </p>
+        <p style="margin-bottom:12px;">
+          <span style="color:var(--cyan)">◆ TOPOLOGIE</span><br>
+          L'espace est entièrement connexe (1 seule composante) et d'entropie quasi-maximale (~99.3%). Cela signifie que la langue exploite son espace de façon presque optimale, sans biais positionnel fort.
+        </p>
+        <p style="margin-bottom:12px;">
+          <span style="color:var(--purple)">◆ DIMENSION FRACTALE</span><br>
+          D = 0.372 confirme une structure lacunaire : chaque racine valide est en contact avec au moins une zone interdite. L'espace ressemble topologiquement à une éponge de Menger — dense mais infiniment troué.
+        </p>
+        <p>
+          <span style="color:var(--green)">◆ MULTI-FRACTALITÉ</span><br>
+          L'amplitude quasi-nulle du spectre D(q) révèle une structure <em>monofractale</em> : les contraintes phonologiques s'appliquent uniformément sur tout l'espace — aucune région n'est plus "accidentée" qu'une autre. La langue est auto-similaire à toutes les échelles articulatoires.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {"types_vides":{"HOMORGANIQUE":2254,"2EMPHATS":1016,"OCP_C1C2":784,"EMPH_GUTT":1184,"H_H":132,"HAMZA_AYN":132},"deg_dist":{"1":37,"2":131,"3":389,"4":870,"5":1588,"6":2094,"7":2410,"8":2629,"9":2221,"10":1667,"11":1091,"12":622,"13":368,"14":191,"15":92,"16":30,"17":6,"18":2},"hist_data":{"bins":[54.5,55.4,56.4,57.4,58.3,59.3,60.3,61.2,62.2,63.1,64.1,65.1,66.0,67.0,67.9,68.9,69.9,70.8,71.8,72.8,73.7,74.7,75.6,76.6,77.6,78.5],"counts":[12,32,96,262,406,600,744,672,876,994,952,480,1020,648,760,784,352,664,580,928,812,752,912,848,816,448],"mean":68.35,"median":68.0},"heatmap_data":{"matrix":[[0.964,0.964,0.689,0.893,0.940,0.929,0.929,0.786,0.893],[0.964,0.964,0.689,0.893,0.940,0.929,0.929,0.786,0.893],[0.704,0.704,0.560,0.622,0.680,0.668,0.668,0.388,0.648],[0.899,0.899,0.613,0.833,0.875,0.863,0.863,0.643,0.833],[0.940,0.940,0.665,0.869,0.933,0.905,0.905,0.762,0.869],[0.929,0.929,0.653,0.857,0.905,0.929,0.893,0.750,0.857],[0.929,0.929,0.653,0.857,0.905,0.893,0.929,0.750,0.857],[0.786,0.786,0.388,0.643,0.762,0.750,0.750,0.768,0.375],[0.893,0.893,0.633,0.827,0.869,0.857,0.857,0.375,0.875]],"labels":["Bil","Lab","Den","Alv","Pal","Vél","Uvu","Pha","Glo"]},"entropie":[{"position":"C1","H":4.7871,"Hmax":4.8074},{"position":"C2","H":4.7660,"Hmax":4.8074},{"position":"C3","H":4.7838,"Hmax":4.8074}],"mode_pos":[{"position":"C1","mode":"occlusive","count":4444},{"position":"C1","mode":"fricative","count":7342},{"position":"C1","mode":"nasale","count":1340},{"position":"C1","mode":"laterale","count":670},{"position":"C1","mode":"roulée","count":670},{"position":"C1","mode":"approx","count":1340},{"position":"C1","mode":"affriquee","count":644},{"position":"C2","mode":"occlusive","count":4232},{"position":"C2","mode":"fricative","count":7232},{"position":"C2","mode":"nasale","count":1440},{"position":"C2","mode":"laterale","count":720},{"position":"C2","mode":"roulée","count":720},{"position":"C2","mode":"approx","count":1440},{"position":"C2","mode":"affriquee","count":666},{"position":"C3","mode":"occlusive","count":4426},{"position":"C3","mode":"fricative","count":7332},{"position":"C3","mode":"nasale","count":1348},{"position":"C3","mode":"laterale","count":674},{"position":"C3","mode":"roulée","count":674},{"position":"C3","mode":"approx","count":1348},{"position":"C3","mode":"affriquee","count":648}],"class_pos":[{"position":"C1","classe":"obstruante","count":11946},{"position":"C1","classe":"sonante","count":4504},{"position":"C2","classe":"obstruante","count":11626},{"position":"C2","classe":"sonante","count":4824},{"position":"C3","classe":"obstruante","count":11922},{"position":"C3","classe":"sonante","count":4528}],"cats_count":{"Saines":4852,"Avec w/y":3860,"Avec emphatique":4454,"Avec gutturale":6004,"Palindromes":600,"Géminées":600},"boxcount":{"front":{"x":[-0.185,-0.879,-1.572,-2.265,-2.958,-3.651,-4.344,-5.037,-5.731,-6.424,-7.117,-7.810],"y":[3.784,5.182,6.410,7.228,7.526,7.576,7.584,7.586,7.587,7.587,7.587,7.587]},"valid":{"x":[-0.177,-0.870,-1.563,-2.256,-2.949,-3.643,-4.336,-5.029,-5.722,-6.415,-7.108,-7.802],"y":[3.807,5.130,6.368,7.196,7.513,7.570,7.582,7.583,7.583,7.583,7.583,7.583]}},"spectre":{"q":[-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0],"Dq":[1.001,1.001,1.001,1.001,1.000,1.000,1.000,1.000,0.999,0.999,0.999,0.999,0.998,0.998,0.998,0.998]},"freq_lieu_pos":[{"position":"C1","lieu":"alveolaire","count":3682},{"position":"C1","lieu":"dentale","count":3382},{"position":"C1","lieu":"palatale","count":1958},{"position":"C1","lieu":"bilabiale","count":2010},{"position":"C1","lieu":"velaire","count":1288},{"position":"C1","lieu":"uvulaire","count":1288},{"position":"C1","lieu":"glottale","count":1204},{"position":"C1","lieu":"pharyngale","count":968},{"position":"C1","lieu":"labiodentale","count":670},{"position":"C2","lieu":"alveolaire","count":3810},{"position":"C2","lieu":"dentale","count":2784},{"position":"C2","lieu":"palatale","count":2052},{"position":"C2","lieu":"bilabiale","count":2160},{"position":"C2","lieu":"velaire","count":1332},{"position":"C2","lieu":"uvulaire","count":1332},{"position":"C2","lieu":"glottale","count":1252},{"position":"C2","lieu":"pharyngale","count":1008},{"position":"C2","lieu":"labiodentale","count":720},{"position":"C3","lieu":"alveolaire","count":3680},{"position":"C3","lieu":"dentale","count":3332},{"position":"C3","lieu":"palatale","count":1970},{"position":"C3","lieu":"bilabiale","count":2022},{"position":"C3","lieu":"velaire","count":1296},{"position":"C3","lieu":"uvulaire","count":1296},{"position":"C3","lieu":"glottale","count":1212},{"position":"C3","lieu":"pharyngale","count":968},{"position":"C3","lieu":"labiodentale","count":674}]};
+
+const COLORS = ['#e63946','#f4a261','#2a9d8f','#4a9eff','#a78bfa','#22c55e','#f4d03f','#e84393'];
+const GOLD = '#c9a84c'; const BLUE='#4a9eff'; const CYAN='#2dd4bf';
+const MUTED='#5a7a99'; const BG3='#111c2c'; const BORDER='rgba(30,48,80,0.8)';
+
+const defaults = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{ labels:{ color:'#8ba8c4', font:{family:'IBM Plex Mono',size:11}, boxWidth:12 } } },
+  scales:{
+    x:{ ticks:{color:MUTED,font:{size:10}}, grid:{color:'rgba(30,48,80,0.6)'}, border:{color:'rgba(30,48,80,0.8)'} },
+    y:{ ticks:{color:MUTED,font:{size:10}}, grid:{color:'rgba(30,48,80,0.4)'}, border:{color:'rgba(30,48,80,0.8)'} }
+  }
+};
+
+function mkChart(id, cfg) {
+  return new Chart(document.getElementById(id).getContext('2d'), cfg);
+}
+
+// ── C1 : Donut zones vides ──
+mkChart('c1', { type:'doughnut', data:{
+  labels:['Homorganique adj.','Emph + Gutturale','2 Emphatiques','OCP C1=C2','ه + ح','ء + ع'],
+  datasets:[{data:[2254,1184,1016,784,132,132], backgroundColor:COLORS,
+    borderColor:'#070b10', borderWidth:3, hoverOffset:8}]
+}, options:{...defaults, cutout:'60%',
+  plugins:{...defaults.plugins, legend:{...defaults.plugins.legend, position:'right'}}}});
+
+// ── C2 : Barres horizontales ──
+mkChart('c2', { type:'bar', data:{
+  labels:['Homorganique','Emph+Gutt','2 Emphats','OCP C1=C2','ه+ح','ء+ع'],
+  datasets:[{data:[2254,1184,1016,784,132,132], backgroundColor:COLORS,
+    borderRadius:4, borderSkipped:false}]
+}, options:{...defaults, indexAxis:'y',
+  plugins:{...defaults.plugins, legend:{display:false}}}});
+
+// ── C3 : Donut catégories ──
+mkChart('c3', { type:'doughnut', data:{
+  labels:Object.keys(DATA.cats_count),
+  datasets:[{data:Object.values(DATA.cats_count), backgroundColor:COLORS,
+    borderColor:'#070b10', borderWidth:3, hoverOffset:8}]
+}, options:{...defaults, cutout:'55%',
+  plugins:{...defaults.plugins, legend:{...defaults.plugins.legend, position:'right'}}}});
+
+// ── C4 : Groupes Obstruante/Sonante ──
+mkChart('c4', { type:'bar', data:{
+  labels:['C1','C2','C3'],
+  datasets:[
+    {label:'Obstruantes', data:[11946,11626,11922], backgroundColor:'rgba(74,158,255,0.75)', borderRadius:4},
+    {label:'Sonantes',    data:[4504,4824,4528],    backgroundColor:'rgba(201,168,76,0.75)',  borderRadius:4}
+  ]
+}, options:{...defaults, plugins:{...defaults.plugins}}});
+
+// ── C5 : Distribution degrés ──
+const degKeys = Object.keys(DATA.deg_dist).map(Number).sort((a,b)=>a-b);
+const degVals = degKeys.map(k=>DATA.deg_dist[k]);
+mkChart('c5', { type:'bar', data:{
+  labels:degKeys,
+  datasets:[{label:'Nb racines', data:degVals,
+    backgroundColor:degVals.map((_,i)=>`hsla(${200+i*8},70%,55%,0.8)`),
+    borderRadius:3}]
+}, options:{...defaults, plugins:{...defaults.plugins, legend:{display:false}},
+  scales:{...defaults.scales, x:{...defaults.scales.x, title:{display:true,text:'Degré',color:MUTED}}}}});
+
+// ── C6 : Lieu par position ──
+const lieux_order = ['alveolaire','dentale','bilabiale','palatale','velaire','uvulaire','glottale','pharyngale','labiodentale'];
+const pos_colors = [BLUE, GOLD, CYAN];
+const lieu_datasets = ['C1','C2','C3'].map((pos,pi)=>({
+  label:pos,
+  data:lieux_order.map(l => {
+    const found = DATA.freq_lieu_pos.find(d=>d.position===pos && d.lieu===l);
+    return found ? found.count : 0;
+  }),
+  backgroundColor:pos_colors[pi]+'aa', borderRadius:3
+}));
+mkChart('c6', { type:'bar', data:{ labels:lieux_order, datasets:lieu_datasets },
+  options:{...defaults}});
+
+// ── C7 : Mode par position ──
+const modes_order = ['fricative','occlusive','approx','nasale','laterale','roulée','affriquee'];
+const mode_datasets = ['C1','C2','C3'].map((pos,pi)=>({
+  label:pos,
+  data:modes_order.map(m => {
+    const found = DATA.mode_pos.find(d=>d.position===pos && d.mode===m);
+    return found ? found.count : 0;
+  }),
+  backgroundColor:pos_colors[pi]+'aa', borderRadius:3
+}));
+mkChart('c7', { type:'bar', data:{ labels:modes_order, datasets:mode_datasets },
+  options:{...defaults}});
+
+// ── C8 : Densité locale ──
+mkChart('c8', { type:'bar', data:{
+  labels:DATA.hist_data.bins.map(b=>b.toFixed(1)),
+  datasets:[{label:'Nb racines', data:DATA.hist_data.counts,
+    backgroundColor:DATA.hist_data.bins.map(b=>{
+      const t=(b-54)/(80-54);
+      return `hsla(${200+t*60},65%,${45+t*20}%,0.8)`;
+    }), borderRadius:2}]
+}, options:{...defaults,
+  plugins:{...defaults.plugins, legend:{display:false},
+    annotation:{annotations:{
+      mean:{type:'line', xMin:DATA.hist_data.mean.toFixed(1),xMax:DATA.hist_data.mean.toFixed(1),
+            borderColor:GOLD,borderWidth:2,label:{content:'μ=68.35',display:true}}
+    }}}}});
+
+// ── C9 : Heatmap SVG ──
+(function(){
+  const m = DATA.heatmap_data.matrix;
+  const L = DATA.heatmap_data.labels;
+  const N = L.length;
+  let html = '<table class="heatmap" style="margin-top:16px"><tr><th></th>';
+  L.forEach(l=>html+=`<th>${l}</th>`); html+='</tr>';
+  m.forEach((row,i)=>{
+    html+=`<tr><th style="text-align:right;padding-right:8px">${L[i]}</th>`;
+    row.forEach(v=>{
+      const t=Math.max(0,(v-0.35)/(1-0.35));
+      const r=Math.round(7+t*(44-7)),g=Math.round(11+t*(171-11)),b=Math.round(16+t*(80-16));
+      const tc=t>0.55?'#000':'#fff';
+      html+=`<td style="background:rgb(${r},${g},${b});color:${tc}">${v.toFixed(2)}</td>`;
+    }); html+='</tr>';
+  });
+  html+='</table>';
+  document.getElementById('heatmap-container').innerHTML=html;
+})();
+
+// ── C10 : Entropie ──
+mkChart('c10', { type:'bar', data:{
+  labels:['C1','C2','C3'],
+  datasets:[
+    {label:'Entropie H', data:[4.7871,4.766,4.7838], backgroundColor:[BLUE+'cc',GOLD+'cc',CYAN+'cc'], borderRadius:6},
+    {label:'H max théorique', data:[4.8074,4.8074,4.8074], type:'line',
+     borderColor:'#e63946', borderDash:[4,4], borderWidth:2, pointRadius:0, fill:false}
+  ]
+}, options:{...defaults, scales:{...defaults.scales,
+  y:{...defaults.scales.y, min:4.5, max:4.85,
+    ticks:{...defaults.scales.y.ticks, callback:v=>v.toFixed(3)}}}}});
+
+// ── C11 : Box-counting ──
+const fit = (xs,ys)=>{ const n=xs.length,sx=xs.reduce((a,b)=>a+b)/n,sy=ys.reduce((a,b)=>a+b)/n;
+  const num=xs.reduce((a,x,i)=>a+(x-sx)*(ys[i]-sy),0), den=xs.reduce((a,x)=>a+(x-sx)**2,0);
+  const m=num/den,c=sy-m*sx; return {m,c}; };
+const bF=DATA.boxcount.front, bV=DATA.boxcount.valid;
+const rF=fit(bF.x,bF.y), rV=fit(bV.x,bV.y);
+const xLine=[Math.min(...bF.x),Math.max(...bF.x)];
+mkChart('c11', { type:'scatter', data:{
+  datasets:[
+    {label:'Frontière (points)', data:bF.x.map((x,i)=>({x,y:bF.y[i]})), backgroundColor:'#e63946', pointRadius:5},
+    {label:`Frontière D=${Math.abs(rF.m).toFixed(3)}`, data:xLine.map(x=>({x,y:rF.m*x+rF.c})),
+     type:'line', borderColor:'#e63946', borderDash:[5,3], pointRadius:0, borderWidth:2},
+    {label:'Espace total (points)', data:bV.x.map((x,i)=>({x,y:bV.y[i]})), backgroundColor:BLUE, pointRadius:5},
+    {label:`Total D=${Math.abs(rV.m).toFixed(3)}`, data:xLine.map(x=>({x,y:rV.m*x+rV.c})),
+     type:'line', borderColor:BLUE, borderDash:[5,3], pointRadius:0, borderWidth:2},
+  ]
+}, options:{...defaults, scales:{...defaults.scales,
+  x:{...defaults.scales.x, title:{display:true,text:'log(ε)',color:MUTED}},
+  y:{...defaults.scales.y, title:{display:true,text:'log N(ε)',color:MUTED}}}}});
+
+// ── C12 : Spectre D(q) ──
+mkChart('c12', { type:'line', data:{
+  labels:DATA.spectre.q,
+  datasets:[{
+    label:'D(q)', data:DATA.spectre.Dq,
+    borderColor:GOLD, backgroundColor:'rgba(201,168,76,0.1)',
+    borderWidth:2.5, pointRadius:4, pointBackgroundColor:GOLD, fill:true, tension:0.3
+  }]
+}, options:{...defaults,
+  scales:{...defaults.scales,
+    x:{...defaults.scales.x, title:{display:true,text:'q',color:MUTED}},
+    y:{...defaults.scales.y, min:0.997, max:1.002,
+       ticks:{...defaults.scales.y.ticks,callback:v=>v.toFixed(4)},
+       title:{display:true,text:'D(q)',color:MUTED}}}}});
+
+// ── Navigation ──
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>
