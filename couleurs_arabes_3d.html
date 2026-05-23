@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Couleurs Arabes — Topologie Phonétique 3D · Hassan Bibote</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=IBM+Plex+Mono:wght@300;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#030810;color:#c8daea;font-family:'IBM Plex Mono',monospace;
+     height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+header{
+  padding:14px 26px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;border-bottom:1px solid rgba(201,168,76,.15);
+  background:linear-gradient(180deg,#060e1c 0%,#030810 100%);
+}
+.ht{font-family:'Cinzel',serif;font-size:1.05rem;color:#c9a84c;letter-spacing:.14em}
+.hs{font-size:.58rem;color:#3a5a7a;margin-top:3px;letter-spacing:.12em}
+.hk{display:flex;gap:18px}
+.kv{font-size:.85rem;font-weight:600;text-align:center}
+.kl{font-size:.5rem;color:#3a5a7a;text-align:center;letter-spacing:.08em;margin-top:1px}
+
+.main{flex:1;display:flex;min-height:0;position:relative}
+canvas{display:block;flex:1;cursor:grab;min-width:0}
+canvas:active{cursor:grabbing}
+
+.panel{
+  width:256px;background:#040b16;
+  border-left:1px solid rgba(26,45,69,.8);
+  display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0
+}
+.ps{padding:14px 16px;border-bottom:1px solid rgba(13,30,48,.9)}
+.pt{font-family:'Cinzel',serif;font-size:.6rem;color:#c9a84c;
+    letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px}
+
+.clist{display:flex;flex-direction:column;gap:5px}
+.ci{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;
+    border:1px solid transparent;cursor:pointer;transition:all .2s}
+.ci:hover{border-color:rgba(201,168,76,.2);background:rgba(255,255,255,.02)}
+.ci.off{opacity:.2}
+.cbulb{width:14px;height:14px;border-radius:50%;flex-shrink:0;
+       box-shadow:0 0 8px currentColor}
+.car{font-size:1rem;color:inherit;direction:rtl;min-width:36px;text-align:right}
+.cfr{font-size:.63rem;color:#8aaabb;flex:1}
+.cdeg{font-size:.58rem;color:#3a5a7a;margin-left:auto}
+
+.cr2{margin-bottom:8px}
+.cl2{font-size:.57rem;color:#3a5a7a;margin-bottom:4px;letter-spacing:.06em}
+input[type=range]{width:100%;accent-color:#c9a84c;cursor:pointer}
+.tr2{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.tl2{font-size:.62rem;color:#8aaabb}
+.tog{width:32px;height:16px;background:#0d1e30;border-radius:16px;
+     cursor:pointer;position:relative;transition:.3s;flex-shrink:0}
+.tog.on{background:rgba(201,168,76,.3)}
+.tog::after{content:'';position:absolute;width:10px;height:10px;background:#3a5a7a;
+            border-radius:50%;top:3px;left:3px;transition:.3s}
+.tog.on::after{left:19px;background:#c9a84c}
+
+.info-card{border-radius:7px;padding:12px;margin-top:6px;display:none;
+           border:1px solid rgba(201,168,76,.2);background:rgba(201,168,76,.04)}
+.info-card.on{display:block}
+.ic-ar{font-size:2rem;text-align:center;direction:rtl;font-family:'Cinzel',serif;
+       letter-spacing:.18em;margin-bottom:4px}
+.ic-fr{font-size:.72rem;text-align:center;letter-spacing:.14em;margin-bottom:8px}
+.ic-row{font-size:.6rem;color:#3a5a7a;margin-bottom:3px;display:flex;justify-content:space-between}
+.ic-val{color:#8aaabb}
+
+.dist-mini{font-size:.6rem;color:#3a5a7a;margin-top:8px}
+.dist-bar{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.dist-name{min-width:42px;color:#8aaabb;text-align:right}
+.dist-track{flex:1;height:3px;background:#0d1e30;border-radius:2px;overflow:hidden}
+.dist-fill{height:100%;border-radius:2px;transition:width .4s}
+.dist-num{min-width:32px;text-align:right;color:#3a5a7a}
+
+.cluster-badge{display:inline-block;font-size:.55rem;padding:2px 7px;
+               border-radius:10px;margin-top:4px;letter-spacing:.06em}
+
+#tt{position:fixed;background:rgba(3,8,16,.97);border:1px solid;
+    border-radius:7px;padding:8px 13px;font-size:.63rem;pointer-events:none;
+    display:none;z-index:999;backdrop-filter:blur(10px)}
+.tt-ar{font-size:1.1rem;direction:rtl;margin-bottom:2px;font-family:'Cinzel',serif}
+.tt-fr{letter-spacing:.1em;margin-bottom:2px}
+.tt-d{color:#3a5a7a;font-size:.57rem}
+
+footer{background:#040b16;border-top:1px solid rgba(26,45,69,.6);
+       padding:5px 24px;display:flex;justify-content:space-between;flex-shrink:0}
+.ft{font-size:.53rem;color:#2a4a6a;letter-spacing:.08em}
+
+.legend-clusters{display:flex;gap:10px;margin-top:8px}
+.lc-item{flex:1;border-radius:5px;padding:7px 8px;border:1px solid}
+.lc-title{font-size:.58rem;font-weight:600;margin-bottom:4px}
+.lc-dots{display:flex;gap:5px;flex-wrap:wrap}
+.lc-dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="ht">ألوان اللغة العربية — Topologie Phonétique 3D</div>
+    <div class="hs">Les 6 couleurs fondamentales · Distance phonétique · Clustering · Hassan Bibote · 2025</div>
+  </div>
+  <div class="hk">
+    <div><div class="kv" style="color:#c9a84c">6</div><div class="kl">couleurs</div></div>
+    <div><div class="kv" style="color:#4a9eff">8</div><div class="kl">connexions</div></div>
+    <div><div class="kv" style="color:#e63946">2</div><div class="kl">clusters</div></div>
+    <div><div class="kv" style="color:#f4d03f">أسود</div><div class="kl">hub central</div></div>
+  </div>
+</header>
+
+<div class="main">
+<canvas id="cvs"></canvas>
+
+<div class="panel">
+
+  <div class="ps">
+    <div class="pt">Les 6 couleurs</div>
+    <div class="clist" id="clist"></div>
+    <div class="legend-clusters">
+      <div class="lc-item" style="border-color:rgba(230,100,50,.3);background:rgba(230,100,50,.04)">
+        <div class="lc-title" style="color:#e8a070">Couleurs chaudes</div>
+        <div class="lc-dots">
+          <div class="lc-dot" style="background:#22c55e"></div>
+          <div class="lc-dot" style="background:#e63946"></div>
+          <div class="lc-dot" style="background:#f4d03f"></div>
+        </div>
+      </div>
+      <div class="lc-item" style="border-color:rgba(74,158,255,.2);background:rgba(74,158,255,.03)">
+        <div class="lc-title" style="color:#6aaae8">Couleurs froides</div>
+        <div class="lc-dots">
+          <div class="lc-dot" style="background:#4a9eff"></div>
+          <div class="lc-dot" style="background:#888888"></div>
+          <div class="lc-dot" style="background:#e8e8f0;border:1px solid rgba(255,255,255,.2)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Affichage</div>
+    <div class="cr2"><div class="cl2">Taille des nœuds</div>
+      <input type="range" min="8" max="30" value="16" step="1" oninput="nodeR=+this.value">
+    </div>
+    <div class="cr2"><div class="cl2">Épaisseur des arêtes</div>
+      <input type="range" min="0.5" max="5" value="1.5" step=".5" oninput="edgeW=+this.value">
+    </div>
+    <div class="cr2"><div class="cl2">Vitesse rotation</div>
+      <input type="range" min="0" max="4" value="0.8" step=".2" oninput="spd=+this.value">
+    </div>
+    <div class="tr2"><span class="tl2">Rotation auto</span>
+      <div class="tog on" id="tRot" onclick="autoRot=!autoRot;this.classList.toggle('on')"></div>
+    </div>
+    <div class="tr2"><span class="tl2">Labels arabes</span>
+      <div class="tog on" id="tLbl" onclick="showLbl=!showLbl;this.classList.toggle('on')"></div>
+    </div>
+    <div class="tr2"><span class="tl2">Labels français</span>
+      <div class="tog" id="tFr" onclick="showFr=!showFr;this.classList.toggle('on')"></div>
+    </div>
+    <div class="tr2"><span class="tl2">Distances sur arêtes</span>
+      <div class="tog" id="tDist" onclick="showDist=!showDist;this.classList.toggle('on')"></div>
+    </div>
+    <div class="tr2"><span class="tl2">Halo de couleur</span>
+      <div class="tog on" id="tHalo" onclick="showHalo=!showHalo;this.classList.toggle('on')"></div>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Nœud sélectionné</div>
+    <div style="font-size:.6rem;color:#3a5a7a">Cliquez sur une couleur</div>
+    <div class="info-card" id="icard">
+      <div class="ic-ar" id="ic-ar"></div>
+      <div class="ic-fr" id="ic-fr"></div>
+      <div class="ic-row"><span>Cluster</span><span class="ic-val" id="ic-cl"></span></div>
+      <div class="ic-row"><span>Connexions</span><span class="ic-val" id="ic-deg"></span></div>
+      <div class="ic-row"><span>Gabarit</span><span class="ic-val">أَفْعَل</span></div>
+      <div class="dist-mini" id="ic-dists"></div>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Découverte clé</div>
+    <div style="font-size:.62rem;color:#8aaabb;line-height:1.8">
+      <div style="color:#c9a84c;font-weight:600;margin-bottom:6px">Paradoxe blanc ↔ noir</div>
+      أبيض et أسود sont les plus <span style="color:#4a9eff">proches</span> phonétiquement (d=2.828) alors qu'ils sont les plus <span style="color:#e63946">opposés</span> sémantiquement.
+      <div style="margin-top:8px;color:#c9a84c;font-weight:600;margin-bottom:6px">Hub topologique</div>
+      أسود (noir) connecte les deux clusters — 4 arêtes sur 5 possibles.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div id="tt">
+  <div class="tt-ar" id="tt-ar"></div>
+  <div class="tt-fr" id="tt-fr"></div>
+  <div class="tt-d" id="tt-d"></div>
+</div>
+
+<footer>
+  <div class="ft">Glisser = rotation · Molette = zoom · Clic = détail · Double-clic = recentrer</div>
+  <div class="ft">bibotehassan.github.io/racines-arabes/ · Hassan Bibote 2025</div>
+</footer>
+
+<script>
+const D = {"c":[{"n":"\u0623\u062e\u0636\u0631","fr":"Vert","hex":"#22c55e","xyz":[-0.7838,-0.3023,0.399],"deg":2,"cl":0,"dist":[0.0,3.0,3.873,4.123,3.606,3.0]},{"n":"\u0623\u062d\u0645\u0631","fr":"Rouge","hex":"#e63946","xyz":[-0.5488,-0.3315,-1.0],"deg":3,"cl":0,"dist":[3.0,0.0,3.742,4.0,3.162,3.162]},{"n":"\u0623\u0632\u0631\u0642","fr":"Bleu","hex":"#4a9eff","xyz":[0.5752,1.0,-0.1187],"deg":2,"cl":1,"dist":[3.873,3.742,0.0,3.464,2.828,3.742]},{"n":"\u0623\u0628\u064a\u0636","fr":"Blanc","hex":"#e8e8f0","xyz":[1.0,-0.7246,0.4227],"deg":2,"cl":1,"dist":[4.123,4.0,3.464,0.0,2.828,4.243]},{"n":"\u0623\u0633\u0648\u062f","fr":"Noir","hex":"#888888","xyz":[0.5027,-0.0019,-0.2957],"deg":4,"cl":1,"dist":[3.606,3.162,2.828,2.828,0.0,3.464]},{"n":"\u0623\u0635\u0641\u0631","fr":"Jaune","hex":"#f4d03f","xyz":[-0.7453,0.3602,0.5928],"deg":3,"cl":0,"dist":[3.0,3.162,3.742,4.243,3.464,0.0]}],"e":[[0,1,3.0],[0,5,3.0],[1,4,3.162],[1,5,3.162],[2,3,3.464],[2,4,2.828],[3,4,2.828],[4,5,3.464]],"m":[[0.0,3.0,3.873,4.123,3.606,3.0],[3.0,0.0,3.742,4.0,3.162,3.162],[3.873,3.742,0.0,3.464,2.828,3.742],[4.123,4.0,3.464,0.0,2.828,4.243],[3.606,3.162,2.828,2.828,0.0,3.464],[3.0,3.162,3.742,4.243,3.464,0.0]]};
+const C = D.c, E = D.e;
+const FR_LABELS = ['Vert','Rouge','Bleu','Blanc','Noir','Jaune'];
+const CL_LABELS = ['Couleurs chaudes','Couleurs froides'];
+const CL_COLORS = ['#e8a070','#6aaae8'];
+
+const cvs = document.getElementById('cvs');
+const ctx = cvs.getContext('2d');
+let W,H;
+function rsz(){W=cvs.width=cvs.offsetWidth;H=cvs.height=cvs.offsetHeight;}
+rsz(); window.addEventListener('resize',()=>{rsz();});
+
+// Construire la liste des couleurs dans le panel
+const cl = document.getElementById('clist');
+C.forEach((c,i)=>{
+  const div = document.createElement('div');
+  div.className='ci'; div.id='ci'+i;
+  div.onclick=()=>toggleNode(i);
+  div.innerHTML=`<div class="cbulb" style="background:${c.hex};color:${c.hex}"></div>
+    <span class="car" style="color:${c.hex}">${c.n}</span>
+    <span class="cfr">${c.fr}</span>
+    <span class="cdeg">${c.deg} liens</span>`;
+  cl.appendChild(div);
+});
+
+let rX=0.3,rY=0.6,zm=1.2,autoRot=true,spd=0.8;
+let nodeR=16,edgeW=1.5,showLbl=true,showFr=false,showDist=false,showHalo=true;
+const vis=new Array(6).fill(true);
+let pulse=0;
+
+function proj(x,y,z){
+  let cx=x*Math.cos(rY)+z*Math.sin(rY);
+  let cz=-x*Math.sin(rY)+z*Math.cos(rY);
+  let cy=y*Math.cos(rX)-cz*Math.sin(rX);
+  let cz2=y*Math.sin(rX)+cz*Math.cos(rX);
+  const f=3.2*zm,d=f/(f+cz2+2.5);
+  const s=Math.min(W,H)*0.32;
+  return {sx:W/2+cx*d*s,sy:H/2-cy*d*s,d,z:cz2};
+}
+
+function hexToRGB(h){
+  const c=h.replace('#','');
+  return[parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // Fond
+  const bg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*.75);
+  bg.addColorStop(0,'#050d1a');bg.addColorStop(1,'#010508');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  pulse=(pulse+.035)%(Math.PI*2);
+
+  // Grille légère au fond
+  ctx.strokeStyle='rgba(10,25,50,0.6)';ctx.lineWidth=.3;
+  for(let g=-1.5;g<=1.5;g+=.5){
+    const a=proj(g,-1.5,-1.5),b=proj(g,1.5,-1.5);
+    ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke();
+    const c2=proj(-1.5,g,-1.5),d2=proj(1.5,g,-1.5);
+    ctx.beginPath();ctx.moveTo(c2.sx,c2.sy);ctx.lineTo(d2.sx,d2.sy);ctx.stroke();
+  }
+
+  // Projeter tous les nœuds
+  const PP = C.map(c=>proj(c.xyz[0],c.xyz[1],c.xyz[2]));
+
+  // Arêtes — triées par z moyen
+  const aretes = E.map(e=>({e,z:(PP[e[0]].z+PP[e[1]].z)/2}));
+  aretes.sort((a,b)=>a.z-b.z);
+
+  aretes.forEach(({e})=>{
+    if(!vis[e[0]]||!vis[e[1]])return;
+    const [i,j,d]=e;
+    const p1=PP[i],p2=PP[j];
+    const [r1,g1,b1]=hexToRGB(C[i].hex);
+    const [r2,g2,b2]=hexToRGB(C[j].hex);
+    // Gradient sur l'arête
+    const grd=ctx.createLinearGradient(p1.sx,p1.sy,p2.sx,p2.sy);
+    const op = 0.3 + (3.5-d)/(3.5-2.5)*.35;
+    grd.addColorStop(0,`rgba(${r1},${g1},${b1},${op})`);
+    grd.addColorStop(1,`rgba(${r2},${g2},${b2},${op})`);
+    // Trait principal
+    ctx.beginPath();ctx.moveTo(p1.sx,p1.sy);ctx.lineTo(p2.sx,p2.sy);
+    ctx.strokeStyle=grd;
+    ctx.lineWidth=edgeW*(0.5+(3.5-d)/2.5);
+    ctx.stroke();
+    // Halo de l'arête
+    ctx.beginPath();ctx.moveTo(p1.sx,p1.sy);ctx.lineTo(p2.sx,p2.sy);
+    ctx.strokeStyle=`rgba(201,168,76,0.04)`;ctx.lineWidth=edgeW*4;ctx.stroke();
+    // Distance sur l'arête
+    if(showDist){
+      const mx=(p1.sx+p2.sx)/2,my=(p1.sy+p2.sy)/2;
+      ctx.fillStyle='rgba(180,200,220,0.8)';
+      ctx.font=`${Math.round(10*(p1.d+p2.d)/2)}px IBM Plex Mono`;
+      ctx.textAlign='center';
+      ctx.fillText(d.toFixed(2),mx,my-5);
+    }
+  });
+
+  // Nœuds — triés par z
+  const noeuds = C.map((c,i)=>({c,i,p:PP[i]}));
+  noeuds.sort((a,b)=>a.p.z-b.p.z);
+
+  noeuds.forEach(({c,i,p})=>{
+    if(!vis[i])return;
+    const [r,g,b]=hexToRGB(c.hex);
+    const sz=nodeR*p.d;
+
+    // Halo étendu
+    if(showHalo){
+      const gr=ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,sz*4.5);
+      gr.addColorStop(0,`rgba(${r},${g},${b},0.18)`);
+      gr.addColorStop(.4,`rgba(${r},${g},${b},0.06)`);
+      gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
+      ctx.beginPath();ctx.arc(p.sx,p.sy,sz*4.5,0,Math.PI*2);
+      ctx.fillStyle=gr;ctx.fill();
+    }
+
+    // Anneau pulsant pour le hub (أسود = index 4)
+    if(i===4){
+      const pr=(sz*2+Math.sin(pulse)*sz*.4);
+      ctx.beginPath();ctx.arc(p.sx,p.sy,pr,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(201,168,76,${.25+Math.sin(pulse)*.1})`;
+      ctx.lineWidth=1.8;ctx.stroke();
+    }
+
+    // Ombre portée
+    ctx.beginPath();ctx.arc(p.sx+2,p.sy+2,sz,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,0,0,0.4)`;ctx.fill();
+
+    // Contour lumineux
+    ctx.beginPath();ctx.arc(p.sx,p.sy,sz+2,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(${r},${g},${b},0.5)`;ctx.lineWidth=1.5;ctx.stroke();
+
+    // Corps du nœud — gradient sphérique
+    const gn=ctx.createRadialGradient(p.sx-sz*.3,p.sy-sz*.3,sz*.1,p.sx,p.sy,sz);
+    gn.addColorStop(0,`rgba(${Math.min(r+80,255)},${Math.min(g+80,255)},${Math.min(b+80,255)},1)`);
+    gn.addColorStop(.5,`rgba(${r},${g},${b},1)`);
+    gn.addColorStop(1,`rgba(${Math.max(r-60,0)},${Math.max(g-60,0)},${Math.max(b-60,0)},1)`);
+    ctx.beginPath();ctx.arc(p.sx,p.sy,sz,0,Math.PI*2);
+    ctx.fillStyle=gn;ctx.fill();
+
+    // Reflet spéculaire
+    ctx.beginPath();ctx.arc(p.sx-sz*.25,p.sy-sz*.28,sz*.28,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,0.22)`;ctx.fill();
+
+    // Label arabe au-dessus
+    if(showLbl){
+      ctx.font=`${Math.round((sz*1.1+10)*p.d)}px Cinzel`;
+      ctx.textAlign='center';
+      ctx.fillStyle='rgba(255,255,255,0.95)';
+      ctx.fillText(c.n,p.sx,p.sy-sz-7);
+    }
+    // Label français en-dessous
+    if(showFr){
+      ctx.font=`${Math.round(10*p.d)}px IBM Plex Mono`;
+      ctx.textAlign='center';
+      ctx.fillStyle=`rgba(${r},${g},${b},0.8)`;
+      ctx.fillText(c.fr,p.sx,p.sy+sz+13);
+    }
+  });
+}
+
+(function loop(){if(autoRot)rY+=.003*spd;draw();requestAnimationFrame(loop);})();
+
+// Controls
+let drag=false,lx=0,ly=0;
+cvs.addEventListener('mousedown',e=>{drag=true;lx=e.clientX;ly=e.clientY;
+  autoRot=false;document.getElementById('tRot').classList.remove('on');});
+window.addEventListener('mouseup',()=>drag=false);
+window.addEventListener('mousemove',e=>{
+  if(drag){rY+=(e.clientX-lx)*.009;rX+=(e.clientY-ly)*.009;
+    rX=Math.max(-1.4,Math.min(1.4,rX));lx=e.clientX;ly=e.clientY;}
+  hover(e);
+});
+cvs.addEventListener('wheel',e=>{e.preventDefault();
+  zm=Math.max(.4,Math.min(6,zm*(1-e.deltaY*.001)));},{passive:false});
+cvs.addEventListener('dblclick',()=>{rX=.3;rY=.6;zm=1.2;autoRot=true;
+  document.getElementById('tRot').classList.add('on');});
+cvs.addEventListener('touchstart',e=>{e.preventDefault();drag=true;
+  lx=e.touches[0].clientX;ly=e.touches[0].clientY;autoRot=false;},{passive:false});
+window.addEventListener('touchend',()=>drag=false);
+window.addEventListener('touchmove',e=>{if(drag){
+  rY+=(e.touches[0].clientX-lx)*.009;rX+=(e.touches[0].clientY-ly)*.009;
+  lx=e.touches[0].clientX;ly=e.touches[0].clientY;}},{passive:false});
+
+// Nearest
+function nearest(mx,my){
+  let best=-1,bd=35;
+  const PP=C.map(c=>proj(c.xyz[0],c.xyz[1],c.xyz[2]));
+  C.forEach((c,i)=>{
+    if(!vis[i])return;
+    const p=PP[i];
+    const d2=Math.hypot(p.sx-mx,p.sy-my);
+    if(d2<bd){bd=d2;best=i;}
+  });
+  return best;
+}
+
+const tt=document.getElementById('tt');
+function hover(e){
+  const rect=cvs.getBoundingClientRect();
+  const i=nearest(e.clientX-rect.left,e.clientY-rect.top);
+  if(i>=0){
+    const c=C[i];
+    tt.style.cssText='display:block;left:'+(e.clientX+14)+'px;top:'+(e.clientY-10)+'px;border-color:'+c.hex;
+    document.getElementById('tt-ar').style.color=c.hex;
+    document.getElementById('tt-ar').textContent=c.n;
+    document.getElementById('tt-fr').textContent=c.fr+' — '+CL_LABELS[c.cl];
+    document.getElementById('tt-fr').style.color=CL_COLORS[c.cl];
+    const voisins=E.filter(e2=>(e2[0]===i||e2[1]===i)).map(e2=>{
+      const j=e2[0]===i?e2[1]:e2[0];
+      return C[j].fr+'('+e2[2]+')';
+    });
+    document.getElementById('tt-d').textContent='Connexions : '+voisins.join(' · ');
+  } else tt.style.display='none';
+}
+
+cvs.addEventListener('click',e=>{
+  const rect=cvs.getBoundingClientRect();
+  const i=nearest(e.clientX-rect.left,e.clientY-rect.top);
+  if(i<0)return;
+  const c=C[i];
+  document.getElementById('icard').classList.add('on');
+  document.getElementById('ic-ar').textContent=c.n;
+  document.getElementById('ic-ar').style.color=c.hex;
+  document.getElementById('ic-fr').textContent=c.fr;
+  document.getElementById('ic-fr').style.color=c.hex;
+  document.getElementById('ic-cl').textContent=CL_LABELS[c.cl];
+  document.getElementById('ic-cl').style.color=CL_COLORS[c.cl];
+  document.getElementById('ic-deg').textContent=c.deg+'/5 connexions';
+  // Mini barres de distance
+  let html='<div style="color:#3a5a7a;margin-bottom:5px;letter-spacing:.06em">Distances phonétiques</div>';
+  const maxD=Math.max(...c.dist.filter((_,j)=>j!==i));
+  c.dist.forEach((d2,j)=>{
+    if(j===i)return;
+    const pct=Math.round((1-d2/maxD)*100);
+    const isConnected=d2<=3.5;
+    html+=`<div class="dist-bar">
+      <span class="dist-name" style="color:${C[j].hex}">${C[j].fr}</span>
+      <div class="dist-track"><div class="dist-fill" style="width:${pct}%;background:${isConnected?C[j].hex:'#2a4a6a'}"></div></div>
+      <span class="dist-num">${d2.toFixed(2)}</span>
+    </div>`;
+  });
+  document.getElementById('ic-dists').innerHTML=html;
+});
+
+function toggleNode(i){
+  vis[i]=!vis[i];
+  document.getElementById('ci'+i).classList.toggle('off');
+}
+</script>
+</body>
+</html>
