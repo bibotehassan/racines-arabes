@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>ء-ل-م · Voisinage Phonétique 3D · Hassan Bibote</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=IBM+Plex+Mono:wght@300;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#040c16;color:#c8daea;font-family:'IBM Plex Mono',monospace;
+     height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:linear-gradient(90deg,#040c16,#071828,#040c16);
+       border-bottom:1px solid #1a2d45;padding:11px 22px;
+       display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ht{font-family:'Cinzel',serif;font-size:1rem;color:#c9a84c;letter-spacing:.12em}
+.hs{font-size:.58rem;color:#4a6a8a;margin-top:2px}
+.hk{display:flex;gap:14px}
+.kv{font-size:.88rem;color:#f0d080;font-weight:600;text-align:center}
+.kl{font-size:.5rem;color:#4a6a8a;text-align:center}
+.main{flex:1;display:flex;min-height:0}
+canvas{display:block;flex:1;cursor:grab;min-width:0}
+canvas:active{cursor:grabbing}
+.panel{width:248px;background:#050e1a;border-left:1px solid #1a2d45;
+       display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.ps{padding:13px;border-bottom:1px solid #0d1e30}
+.pt{font-family:'Cinzel',serif;font-size:.62rem;color:#c9a84c;
+    letter-spacing:.15em;text-transform:uppercase;margin-bottom:9px}
+.ccard{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.35);
+       border-radius:8px;padding:13px;text-align:center}
+.car{font-size:2.4rem;color:#f0d080;direction:rtl;font-family:'Cinzel',serif;
+     letter-spacing:.2em;margin-bottom:4px}
+.clat{font-size:.78rem;color:#4a9eff;letter-spacing:.16em}
+.ccat{font-size:.58rem;color:#f4a261;margin-top:3px}
+.cstats{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px}
+.cs{background:#0a1525;border-radius:5px;padding:5px;text-align:center}
+.csv{font-size:.82rem;color:#f0d080;font-weight:600}
+.csl{font-size:.5rem;color:#4a6a8a}
+.li{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:4px;
+    border:1px solid transparent;cursor:pointer;margin-bottom:3px;transition:all .2s}
+.li:hover{background:rgba(255,255,255,.03);border-color:#1a2d45}
+.li.off{opacity:.25}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ll{font-size:.62rem}.lc{font-size:.56rem;color:#4a6a8a;margin-left:auto}
+.cr{margin-bottom:7px}.cl{font-size:.57rem;color:#4a6a8a;margin-bottom:3px}
+input[type=range]{width:100%;accent-color:#c9a84c;cursor:pointer}
+.tr2{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tl{font-size:.62rem}
+.tog{width:34px;height:17px;background:#1a2d45;border-radius:17px;
+     cursor:pointer;position:relative;transition:.3s;flex-shrink:0}
+.tog.on{background:rgba(201,168,76,.35)}
+.tog::after{content:'';position:absolute;width:11px;height:11px;background:#4a6a8a;
+            border-radius:50%;top:3px;left:3px;transition:.3s}
+.tog.on::after{left:20px;background:#c9a84c}
+.vc{background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.25);
+    border-radius:7px;padding:11px;margin-top:6px;display:none}
+.vc.on{display:block}
+.vcar{font-size:1.5rem;color:#f0d080;text-align:center;direction:rtl;
+      font-family:'Cinzel',serif;letter-spacing:.15em;margin-bottom:3px}
+.vclat{font-size:.68rem;color:#4a9eff;text-align:center;letter-spacing:.12em}
+.vcinfo{font-size:.58rem;color:#4a6a8a;text-align:center;margin-top:4px;line-height:1.8;white-space:pre-line}
+.legende{font-size:.56rem;color:#4a6a8a;line-height:2;margin-top:4px}
+.legende span{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+#tt{position:fixed;background:rgba(4,12,22,.96);border:1px solid #c9a84c;
+    border-radius:6px;padding:7px 12px;font-size:.62rem;pointer-events:none;
+    display:none;z-index:999;backdrop-filter:blur(8px)}
+.ta{font-size:1.1rem;color:#f0d080;direction:rtl;margin-bottom:2px}
+.tlt{color:#4a9eff;letter-spacing:.1em}.tc2{color:#4a6a8a;font-size:.57rem;margin-top:2px}
+footer{background:#050e1a;border-top:1px solid #1a2d45;padding:5px 22px;
+       display:flex;justify-content:space-between;flex-shrink:0}
+.ft{font-size:.53rem;color:#4a6a8a}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="ht">ء &nbsp;—&nbsp; ل &nbsp;—&nbsp; م &nbsp;·&nbsp; Voisinage Phonétique 3D</div>
+    <div class="hs">Topologie de la racine centrale dans l'espace triconsonantique arabe · Hassan Bibote · 2025</div>
+  </div>
+  <div class="hk">
+    <div><div class="kv" style="color:#f0d080;font-size:1.3rem">ءلم</div><div class="kl">Racine centrale</div></div>
+    <div><div class="kv">76</div><div class="kl">Voisines dist=1</div></div>
+    <div><div class="kv">120</div><div class="kl">Voisines dist=2</div></div>
+    <div><div class="kv" style="color:#e63946">5</div><div class="kl">Zones vides</div></div>
+    <div><div class="kv" style="color:#2dd4bf">93.8%</div><div class="kl">Densité locale</div></div>
+  </div>
+</header>
+<div class="main">
+<canvas id="cvs"></canvas>
+<div class="panel">
+
+  <div class="ps">
+    <div class="pt">Racine Centrale</div>
+    <div class="ccard">
+      <div class="car">ءلم</div>
+      <div class="clat">ALM &nbsp;·&nbsp; ء - ل - م</div>
+      <div class="ccat">Catégorie : Gutturale</div>
+      <div class="cstats">
+        <div class="cs"><div class="csv">76</div><div class="csl">voisines dir.</div></div>
+        <div class="cs"><div class="csv">93.8%</div><div class="csl">densité</div></div>
+        <div class="cs"><div class="csv" style="color:#e63946">5</div><div class="csl">zones vides</div></div>
+        <div class="cs"><div class="csv">120</div><div class="csl">dist=2</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Structure Sphérique</div>
+    <div class="legende">
+      <div><span style="background:#f0d080;box-shadow:0 0 6px #c9a84c"></span>Centre ءلم — rayon 0</div>
+      <div><span style="background:#4a9eff"></span>Voisines dist=1 — rayon 1.0</div>
+      <div><span style="background:rgba(74,158,255,.35)"></span>Voisines dist=2 — rayon 2.0</div>
+      <div><span style="background:#e63946"></span>Zones vides — rayon 0.85</div>
+    </div>
+    <div style="font-size:.54rem;color:#4a6a8a;margin-top:8px;line-height:1.7">
+      C1 changée → secteur <span style="color:#c9a84c">haut</span><br>
+      C2 changée → secteur <span style="color:#c9a84c">équateur</span><br>
+      C3 changée → secteur <span style="color:#c9a84c">bas</span>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Couches</div>
+    <div class="li" id="lg0" onclick="tV(0)">
+      <div class="dot" style="background:#f0d080;box-shadow:0 0 6px #c9a84c"></div>
+      <span class="ll">Centre (ءلم)</span><span class="lc">1</span>
+    </div>
+    <div class="li" id="lg1" onclick="tV(1)">
+      <div class="dot" style="background:#4a9eff"></div>
+      <span class="ll">Voisines dist = 1</span><span class="lc">76</span>
+    </div>
+    <div class="li" id="lg2" onclick="tV(2)">
+      <div class="dot" style="background:rgba(74,158,255,.4)"></div>
+      <span class="ll">Voisines dist = 2</span><span class="lc">120</span>
+    </div>
+    <div class="li" id="lg3" onclick="tV(3)">
+      <div class="dot" style="background:#e63946"></div>
+      <span class="ll">Zones vides (×)</span><span class="lc">5</span>
+    </div>
+    <div class="li" id="lg4" onclick="tV(4)">
+      <div class="dot" style="background:rgba(255,255,255,.2)"></div>
+      <span class="ll">Lignes de connexion</span><span class="lc">76</span>
+    </div>
+    <div class="li" id="lg5" onclick="tV(5)">
+      <div class="dot" style="background:#1a3a5c;border:1px solid #2a5a8c"></div>
+      <span class="ll">Sphères de référence</span><span class="lc">2</span>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Affichage</div>
+    <div class="cr"><div class="cl">Taille points</div>
+      <input type="range" min="2" max="14" value="5" step=".5" oninput="ptSz=+this.value">
+    </div>
+    <div class="cr"><div class="cl">Opacité</div>
+      <input type="range" min=".1" max="1" value=".88" step=".05" oninput="ptOp=+this.value">
+    </div>
+    <div class="cr"><div class="cl">Vitesse rotation</div>
+      <input type="range" min="0" max="5" value="1" step=".2" oninput="spd=+this.value">
+    </div>
+    <div class="tr2"><span class="tl">Rotation auto</span>
+      <div class="tog on" id="tRot" onclick="autoRot=!autoRot;this.classList.toggle('on')"></div>
+    </div>
+    <div class="tr2"><span class="tl">Axes 3D</span>
+      <div class="tog on" id="tAx" onclick="showAx=!showAx;this.classList.toggle('on')"></div>
+    </div>
+  </div>
+
+  <div class="ps">
+    <div class="pt">Point sélectionné</div>
+    <div style="font-size:.6rem;color:#4a6a8a">Cliquez sur un point</div>
+    <div class="vc" id="vcard">
+      <div class="vcar" id="vcAr"></div>
+      <div class="vclat" id="vcLat"></div>
+      <div class="vcinfo" id="vcInfo"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+<div id="tt"><div class="ta" id="ttAr"></div><div class="tlt" id="ttLat"></div><div class="tc2" id="ttCat"></div></div>
+<footer>
+  <div class="ft">🖱 Glisser = rotation · Molette = zoom · Clic = détail · Double-clic = recentrer</div>
+  <div class="ft">bibotehassan.github.io/racines-arabes/</div>
+</footer>
+
+<script>
+const D = {"centre":{"ar":"\u0621\u0644\u0645","latin":"'-l-m","cat":1,"densite":76,"xyz":[0.0,0.0,0.0]},"v1":[{"ar":"\u0628\u0644\u0645","latin":"b-l-m","cat":3,"pos":0,"xyz":[0.6036,0.3133,0.7566]},{"ar":"\u062a\u0644\u0645","latin":"t-l-m","cat":3,"pos":0,"xyz":[-0.9602,0.4279,-0.3748]},{"ar":"\u0637\u0644\u0645","latin":"T-l-m","cat":0,"pos":0,"xyz":[0.9155,0.3563,-0.4063]},{"ar":"\u062f\u0644\u0645","latin":"d-l-m","cat":3,"pos":0,"xyz":[-0.3214,0.5157,0.7266]},{"ar":"\u0636\u0644\u0645","latin":"D-l-m","cat":0,"pos":0,"xyz":[-0.3628,0.431,-0.7541]},{"ar":"\u0643\u0644\u0645","latin":"k-l-m","cat":3,"pos":0,"xyz":[0.7301,0.4697,0.3158]},{"ar":"\u0642\u0644\u0645","latin":"q-l-m","cat":3,"pos":0,"xyz":[-0.8194,0.541,0.1956]},{"ar":"\u0641\u0644\u0645","latin":"f-l-m","cat":3,"pos":0,"xyz":[0.4901,0.5861,-0.7043]},{"ar":"\u062b\u0644\u0645","latin":"th-l-m","cat":3,"pos":0,"xyz":[0.2357,0.517,0.8023]},{"ar":"\u0630\u0644\u0645","latin":"dh-l-m","cat":3,"pos":0,"xyz":[-0.7222,0.5679,-0.4322]},{"ar":"\u0638\u0644\u0645","latin":"Z-l-m","cat":0,"pos":0,"xyz":[0.7439,0.5862,-0.1464]},{"ar":"\u0633\u0644\u0645","latin":"s-l-m","cat":3,"pos":0,"xyz":[-0.5455,0.5957,0.5914]},{"ar":"\u0635\u0644\u0645","latin":"S-l-m","cat":0,"pos":0,"xyz":[-0.1012,0.6761,-0.6491]},{"ar":"\u0632\u0644\u0645","latin":"z-l-m","cat":3,"pos":0,"xyz":[0.5586,0.6765,0.459]},{"ar":"\u0634\u0644\u0645","latin":"sh-l-m","cat":3,"pos":0,"xyz":[-0.7444,0.8155,-0.0263]},{"ar":"\u062e\u0644\u0645","latin":"kh-l-m","cat":3,"pos":0,"xyz":[0.4764,0.7515,-0.3071]},{"ar":"\u063a\u0644\u0645","latin":"gh-l-m","cat":3,"pos":0,"xyz":[-0.0758,0.803,0.6555]},{"ar":"\u062d\u0644\u0645","latin":"H-l-m","cat":1,"pos":0,"xyz":[-0.3719,0.7234,-0.5206]},{"ar":"\u0647\u0644\u0645","latin":"h-l-m","cat":1,"pos":0,"xyz":[0.5492,0.8532,0.1742]},{"ar":"\u0639\u0644\u0645","latin":"3-l-m","cat":1,"pos":0,"xyz":[-0.4084,0.8611,0.3217]},{"ar":"\u0645\u0644\u0645","latin":"m-l-m","cat":3,"pos":0,"xyz":[0.1026,0.9452,-0.4396]},{"ar":"\u0646\u0644\u0645","latin":"n-l-m","cat":3,"pos":0,"xyz":[0.1701,0.9253,0.3978]},{"ar":"\u0631\u0644\u0645","latin":"r-l-m","cat":3,"pos":0,"xyz":[-0.2899,1.0132,-0.0168]},{"ar":"\u0648\u0644\u0645","latin":"w-l-m","cat":2,"pos":0,"xyz":[0.2152,0.8614,-0.1393]},{"ar":"\u064a\u0644\u0645","latin":"y-l-m","cat":2,"pos":0,"xyz":[-0.0949,1.0266,0.2199]},{"ar":"\u062c\u0644\u0645","latin":"j-l-m","cat":3,"pos":0,"xyz":[-0.1213,0.9816,0.0497]},{"ar":"\u0621\u0628\u0645","latin":"'-b-m","cat":1,"pos":1,"xyz":[-0.4148,-0.3534,0.7236]},{"ar":"\u0621\u062a\u0645","latin":"'-t-m","cat":1,"pos":1,"xyz":[-0.1928,-0.4272,-0.9522]},{"ar":"\u0621\u0637\u0645","latin":"'-T-m","cat":0,"pos":1,"xyz":[0.8625,-0.3638,0.4095]},{"ar":"\u0621\u062f\u0645","latin":"'-d-m","cat":1,"pos":1,"xyz":[-0.9962,-0.2256,0.3529]},{"ar":"\u0621\u0636\u0645","latin":"'-D-m","cat":0,"pos":1,"xyz":[0.5557,-0.2953,-0.7688]},{"ar":"\u0621\u0643\u0645","latin":"'-k-m","cat":1,"pos":1,"xyz":[0.0984,-0.199,1.0415]},{"ar":"\u0621\u0642\u0645","latin":"'-q-m","cat":1,"pos":1,"xyz":[-0.8041,-0.1668,-0.6816]},{"ar":"\u0621\u0641\u0645","latin":"'-f-m","cat":1,"pos":1,"xyz":[0.98,-0.1216,-0.1087]},{"ar":"\u0621\u062b\u0645","latin":"'-th-m","cat":1,"pos":1,"xyz":[-0.7192,-0.1207,0.6691]},{"ar":"\u0621\u0630\u0645","latin":"'-dh-m","cat":1,"pos":1,"xyz":[-0.0337,-0.1614,-1.0056]},{"ar":"\u0621\u0638\u0645","latin":"'-Z-m","cat":0,"pos":1,"xyz":[0.6304,0.0882,0.6154]},{"ar":"\u0621\u0633\u0645","latin":"'-s-m","cat":1,"pos":1,"xyz":[-0.9853,0.007,-0.0433]},{"ar":"\u0621\u0635\u0645","latin":"'-S-m","cat":0,"pos":1,"xyz":[0.846,-0.0354,-0.578]},{"ar":"\u0621\u0632\u0645","latin":"'-z-m","cat":1,"pos":1,"xyz":[-0.1784,0.0268,1.0227]},{"ar":"\u0621\u0634\u0645","latin":"'-sh-m","cat":1,"pos":1,"xyz":[-0.6151,0.18,-0.7728]},{"ar":"\u0621\u062e\u0645","latin":"'-kh-m","cat":1,"pos":1,"xyz":[0.9297,0.1432,0.297]},{"ar":"\u0621\u063a\u0645","latin":"'-gh-m","cat":1,"pos":1,"xyz":[-0.9454,0.1422,0.4831]},{"ar":"\u0621\u062d\u0645","latin":"'-H-m","cat":1,"pos":1,"xyz":[0.35,0.1449,-0.9171]},{"ar":"\u0621\u0645\u0645","latin":"'-m-m","cat":1,"pos":1,"xyz":[0.3656,0.2745,0.8815]},{"ar":"\u0621\u0646\u0645","latin":"'-n-m","cat":1,"pos":1,"xyz":[-0.8351,0.2412,-0.5571]},{"ar":"\u0621\u0631\u0645","latin":"'-r-m","cat":1,"pos":1,"xyz":[0.9068,0.2508,-0.2565]},{"ar":"\u0621\u0648\u0645","latin":"'-w-m","cat":1,"pos":1,"xyz":[-0.4913,0.1667,0.8123]},{"ar":"\u0621\u064a\u0645","latin":"'-y-m","cat":1,"pos":1,"xyz":[-0.2091,0.2332,-0.901]},{"ar":"\u0621\u062c\u0645","latin":"'-j-m","cat":1,"pos":1,"xyz":[0.7896,0.3108,0.6178]},{"ar":"\u0621\u0644\u0628","latin":"'-l-b","cat":1,"pos":2,"xyz":[0.1073,-0.9738,0.0058]},{"ar":"\u0621\u0644\u062a","latin":"'-l-t","cat":1,"pos":2,"xyz":[0.032,-0.9906,-0.1964]},{"ar":"\u0621\u0644\u0637","latin":"'-l-T","cat":0,"pos":2,"xyz":[0.0122,-0.9856,0.3152]},{"ar":"\u0621\u0644\u062f","latin":"'-l-d","cat":1,"pos":2,"xyz":[-0.3052,-1.0008,-0.2179]},{"ar":"\u0621\u0644\u0636","latin":"'-l-D","cat":0,"pos":2,"xyz":[0.4967,-0.7934,0.0179]},{"ar":"\u0621\u0644\u0643","latin":"'-l-k","cat":1,"pos":2,"xyz":[-0.3988,-0.9027,0.2279]},{"ar":"\u0621\u0644\u0642","latin":"'-l-q","cat":1,"pos":2,"xyz":[0.1237,-0.9101,-0.6035]},{"ar":"\u0621\u0644\u0621","latin":"'-l-'","cat":1,"pos":2,"xyz":[0.3222,-0.7288,0.4822]},{"ar":"\u0621\u0644\u0641","latin":"'-l-f","cat":1,"pos":2,"xyz":[-0.6587,-0.8348,-0.0889]},{"ar":"\u0621\u0644\u062b","latin":"'-l-th","cat":1,"pos":2,"xyz":[0.544,-0.8121,-0.3405]},{"ar":"\u0621\u0644\u0630","latin":"'-l-dh","cat":1,"pos":2,"xyz":[-0.1516,-0.6214,0.5687]},{"ar":"\u0621\u0644\u0638","latin":"'-l-Z","cat":0,"pos":2,"xyz":[-0.3393,-0.7622,-0.7769]},{"ar":"\u0621\u0644\u0633","latin":"'-l-s","cat":1,"pos":2,"xyz":[0.6175,-0.7494,0.3391]},{"ar":"\u0621\u0644\u0635","latin":"'-l-S","cat":0,"pos":2,"xyz":[-0.7099,-0.7594,0.3014]},{"ar":"\u0621\u0644\u0632","latin":"'-l-z","cat":1,"pos":2,"xyz":[0.3289,-0.7406,-0.7234]},{"ar":"\u0621\u0644\u0634","latin":"'-l-sh","cat":1,"pos":2,"xyz":[0.1764,-0.6624,0.7654]},{"ar":"\u0621\u0644\u062e","latin":"'-l-kh","cat":1,"pos":2,"xyz":[-0.8232,-0.6001,-0.3695]},{"ar":"\u0621\u0644\u063a","latin":"'-l-gh","cat":1,"pos":2,"xyz":[0.8672,-0.4915,-0.0838]},{"ar":"\u0621\u0644\u062d","latin":"'-l-H","cat":1,"pos":2,"xyz":[-0.4207,-0.5991,0.7267]},{"ar":"\u0621\u0644\u0647","latin":"'-l-h","cat":1,"pos":2,"xyz":[-0.1938,-0.5422,-0.9735]},{"ar":"\u0621\u0644\u0646","latin":"'-l-n","cat":1,"pos":2,"xyz":[0.7144,-0.4,0.5756]},{"ar":"\u0621\u0644\u0644","latin":"'-l-l","cat":1,"pos":2,"xyz":[-0.7845,-0.4945,0.016]},{"ar":"\u0621\u0644\u0631","latin":"'-l-r","cat":1,"pos":2,"xyz":[0.6708,-0.4919,-0.5894]},{"ar":"\u0621\u0644\u0648","latin":"'-l-w","cat":1,"pos":2,"xyz":[0.0434,-0.4635,0.9667]},{"ar":"\u0621\u0644\u064a","latin":"'-l-y","cat":1,"pos":2,"xyz":[-0.5788,-0.2698,-0.7019]},{"ar":"\u0621\u0644\u062c","latin":"'-l-j","cat":1,"pos":2,"xyz":[0.9643,-0.3114,0.1709]}],"v2":[{"ar":"\u0628\u062a\u0645","latin":"b-t-m","cat":3,"xyz":[0.0397,1.9889,0.0518]},{"ar":"\u0628\u0637\u0645","latin":"b-T-m","cat":0,"xyz":[-0.1474,1.9477,0.2279]},{"ar":"\u0628\u062f\u0645","latin":"b-d-m","cat":3,"xyz":[0.1713,1.9942,-0.5498]},{"ar":"\u0628\u0636\u0645","latin":"b-D-m","cat":0,"xyz":[0.4249,1.8621,0.4604]},{"ar":"\u0628\u0643\u0645","latin":"b-k-m","cat":3,"xyz":[-0.6906,1.7125,-0.2636]},{"ar":"\u0628\u0642\u0645","latin":"b-q-m","cat":3,"xyz":[0.6321,1.7509,-0.4056]},{"ar":"\u0628\u0621\u0645","latin":"b-'-m","cat":1,"xyz":[-0.2999,1.6853,0.9625]},{"ar":"\u0628\u0641\u0645","latin":"b-f-m","cat":3,"xyz":[-0.4519,1.7701,-0.9492]},{"ar":"\u0628\u062b\u0645","latin":"b-th-m","cat":3,"xyz":[0.8973,1.74,0.2515]},{"ar":"\u0628\u0630\u0645","latin":"b-dh-m","cat":3,"xyz":[-0.9476,1.6494,0.3802]},{"ar":"\u0628\u0638\u0645","latin":"b-Z-m","cat":0,"xyz":[0.4222,1.812,-1.0062]},{"ar":"\u0628\u0633\u0645","latin":"b-s-m","cat":3,"xyz":[0.2621,1.6961,1.0078]},{"ar":"\u0628\u0635\u0645","latin":"b-S-m","cat":0,"xyz":[-1.0254,1.4399,-0.7102]},{"ar":"\u0628\u0632\u0645","latin":"b-z-m","cat":3,"xyz":[1.2344,1.6221,-0.2542]},{"ar":"\u0628\u0634\u0645","latin":"b-sh-m","cat":3,"xyz":[-0.7505,1.5053,0.936]},{"ar":"\u0628\u062e\u0645","latin":"b-kh-m","cat":3,"xyz":[-0.2282,1.4589,-1.232]},{"ar":"\u0628\u063a\u0645","latin":"b-gh-m","cat":3,"xyz":[1.0709,1.3211,0.9053]},{"ar":"\u0628\u062d\u0645","latin":"b-H-m","cat":1,"xyz":[-1.4293,1.3744,0.1068]},{"ar":"\u0628\u0647\u0645","latin":"b-h-m","cat":1,"xyz":[1.0984,1.4695,-1.0781]},{"ar":"\u0628\u0639\u0645","latin":"b-3-m","cat":1,"xyz":[-0.0924,1.3878,1.5417]},{"ar":"\u0628\u0645\u0645","latin":"b-m-m","cat":3,"xyz":[-0.9966,1.3129,-1.2369]},{"ar":"\u0628\u0646\u0645","latin":"b-n-m","cat":3,"xyz":[1.4156,1.3591,0.3118]},{"ar":"\u0628\u0631\u0645","latin":"b-r-m","cat":3,"xyz":[-1.2804,1.3408,0.9158]},{"ar":"\u0628\u0648\u0645","latin":"b-w-m","cat":2,"xyz":[0.2951,1.2558,-1.4179]},{"ar":"\u0628\u064a\u0645","latin":"b-y-m","cat":2,"xyz":[0.7951,1.3184,1.183]},{"ar":"\u0628\u062c\u0645","latin":"b-j-m","cat":3,"xyz":[-1.4866,1.1666,-0.5192]},{"ar":"\u0628\u0644\u0628","latin":"b-l-b","cat":3,"xyz":[1.5078,0.967,-0.7108]},{"ar":"\u0628\u0644\u062a","latin":"b-l-t","cat":3,"xyz":[-0.6182,1.2107,1.5039]},{"ar":"\u0628\u0644\u0637","latin":"b-l-T","cat":0,"xyz":[-0.6389,1.0187,-1.5234]},{"ar":"\u0628\u0644\u062f","latin":"b-l-d","cat":3,"xyz":[1.5464,0.9828,0.84]},{"ar":"\u0628\u0644\u0636","latin":"b-l-D","cat":0,"xyz":[-1.6717,1.0691,0.3865]},{"ar":"\u0628\u0644\u0643","latin":"b-l-k","cat":3,"xyz":[0.9233,0.9266,-1.5938]},{"ar":"\u0628\u0644\u0642","latin":"b-l-q","cat":3,"xyz":[0.3241,0.9453,1.7484]},{"ar":"\u0628\u0644\u0621","latin":"b-l-'","cat":1,"xyz":[-1.4345,0.7775,-1.1301]},{"ar":"\u0628\u0644\u0641","latin":"b-l-f","cat":3,"xyz":[1.7734,0.793,-0.1621]},{"ar":"\u0628\u0644\u062b","latin":"b-l-th","cat":3,"xyz":[-1.2054,0.9744,1.3519]},{"ar":"\u0628\u0644\u0630","latin":"b-l-dh","cat":3,"xyz":[0.0296,0.784,-1.9909]},{"ar":"\u0628\u0644\u0638","latin":"b-l-Z","cat":0,"xyz":[1.2419,0.7611,1.5684]},{"ar":"\u0628\u0644\u0633","latin":"b-l-s","cat":3,"xyz":[-1.8723,0.7468,-0.1749]},{"ar":"\u0628\u0644\u0635","latin":"b-l-S","cat":0,"xyz":[1.4021,0.7805,-1.0749]},{"ar":"\u0628\u0644\u0632","latin":"b-l-z","cat":3,"xyz":[-0.2749,0.5827,1.9713]},{"ar":"\u0628\u0644\u0634","latin":"b-l-sh","cat":3,"xyz":[-1.1246,0.6688,-1.4336]},{"ar":"\u0628\u0644\u062e","latin":"b-l-kh","cat":3,"xyz":[1.7643,0.5429,0.5132]},{"ar":"\u0628\u0644\u063a","latin":"b-l-gh","cat":3,"xyz":[-1.7499,0.4306,0.8828]},{"ar":"\u0628\u0644\u062d","latin":"b-l-H","cat":1,"xyz":[0.5862,0.5589,-1.8841]},{"ar":"\u0628\u0644\u0647","latin":"b-l-h","cat":1,"xyz":[0.8553,0.4247,1.7708]},{"ar":"\u0628\u0644\u0639","latin":"b-l-3","cat":1,"xyz":[-1.6951,0.3553,-0.816]},{"ar":"\u0628\u0644\u0646","latin":"b-l-n","cat":3,"xyz":[1.9731,0.2916,-0.5613]},{"ar":"\u0628\u0644\u0644","latin":"b-l-l","cat":3,"xyz":[-0.9714,0.4491,1.594]},{"ar":"\u0628\u0644\u0631","latin":"b-l-r","cat":3,"xyz":[-0.519,0.3947,-1.901]},{"ar":"\u0628\u0644\u0648","latin":"b-l-w","cat":2,"xyz":[1.6296,0.347,1.089]},{"ar":"\u0628\u0644\u064a","latin":"b-l-y","cat":2,"xyz":[-1.9457,0.3092,0.1877]},{"ar":"\u0628\u0644\u062c","latin":"b-l-j","cat":3,"xyz":[1.4353,0.29,-1.6061]},{"ar":"\u062a\u0628\u0645","latin":"t-b-m","cat":3,"xyz":[0.125,0.1405,2.0497]},{"ar":"\u062a\u0643\u0645","latin":"t-k-m","cat":3,"xyz":[-1.3051,0.1192,-1.3414]},{"ar":"\u062a\u0642\u0645","latin":"t-q-m","cat":3,"xyz":[2.0247,0.217,0.2536]},{"ar":"\u062a\u0621\u0645","latin":"t-'-m","cat":1,"xyz":[-1.5588,0.0573,1.2005]},{"ar":"\u062a\u0641\u0645","latin":"t-f-m","cat":3,"xyz":[0.2109,0.0779,-1.9518]},{"ar":"\u062a\u0633\u0645","latin":"t-s-m","cat":3,"xyz":[1.156,0.1166,1.6478]},{"ar":"\u062a\u0635\u0645","latin":"t-S-m","cat":0,"xyz":[-1.8327,-0.0044,-0.2308]},{"ar":"\u062a\u0632\u0645","latin":"t-z-m","cat":3,"xyz":[1.7901,-0.0854,-1.0715]},{"ar":"\u062a\u0634\u0645","latin":"t-sh-m","cat":3,"xyz":[-0.5784,-0.0683,1.9589]},{"ar":"\u062a\u062e\u0645","latin":"t-kh-m","cat":3,"xyz":[-0.7914,-0.0899,-1.8858]},{"ar":"\u062a\u063a\u0645","latin":"t-gh-m","cat":3,"xyz":[1.7168,-0.1534,0.8483]},{"ar":"\u062a\u062d\u0645","latin":"t-H-m","cat":1,"xyz":[-1.8627,-0.2509,0.6797]},{"ar":"\u062a\u0647\u0645","latin":"t-h-m","cat":1,"xyz":[0.9659,-0.2556,-1.746]},{"ar":"\u062a\u0639\u0645","latin":"t-3-m","cat":1,"xyz":[0.502,-0.3099,1.9534]},{"ar":"\u062a\u0645\u0645","latin":"t-m-m","cat":3,"xyz":[-1.6187,-0.1655,-0.9969]},{"ar":"\u062a\u0646\u0645","latin":"t-n-m","cat":3,"xyz":[1.8423,-0.3607,-0.2846]},{"ar":"\u062a\u0631\u0645","latin":"t-r-m","cat":3,"xyz":[-1.1754,-0.2781,1.8633]},{"ar":"\u062a\u0648\u0645","latin":"t-w-m","cat":2,"xyz":[-0.1073,-0.2621,-1.8863]},{"ar":"\u062a\u064a\u0645","latin":"t-y-m","cat":2,"xyz":[1.486,-0.4118,1.4003]},{"ar":"\u062a\u062c\u0645","latin":"t-j-m","cat":3,"xyz":[-2.0171,-0.4391,-0.0579]},{"ar":"\u062a\u0644\u0628","latin":"t-l-b","cat":3,"xyz":[1.4556,-0.2686,-1.4511]},{"ar":"\u062a\u0644\u062a","latin":"t-l-t","cat":3,"xyz":[-0.1335,-0.6164,1.8928]},{"ar":"\u062a\u0644\u0637","latin":"t-l-T","cat":0,"xyz":[-1.0727,-0.5159,-1.63]},{"ar":"\u062a\u0644\u062f","latin":"t-l-d","cat":3,"xyz":[1.8316,-0.5003,0.2947]},{"ar":"\u062a\u0644\u0636","latin":"t-l-D","cat":0,"xyz":[-1.6055,-0.5846,0.9581]},{"ar":"\u062a\u0644\u0643","latin":"t-l-k","cat":3,"xyz":[0.6829,-0.5711,-1.9928]},{"ar":"\u062a\u0644\u0642","latin":"t-l-q","cat":3,"xyz":[0.8694,-0.7084,1.7535]},{"ar":"\u062a\u0644\u0621","latin":"t-l-'","cat":1,"xyz":[-1.8207,-0.6983,-0.6208]},{"ar":"\u062a\u0644\u0641","latin":"t-l-f","cat":3,"xyz":[1.7999,-0.8187,-0.7215]},{"ar":"\u062a\u0644\u062b","latin":"t-l-th","cat":3,"xyz":[-0.8391,-0.8086,1.8105]},{"ar":"\u062a\u0644\u0630","latin":"t-l-dh","cat":3,"xyz":[-0.5004,-0.8908,-1.685]},{"ar":"\u062a\u0644\u0638","latin":"t-l-Z","cat":0,"xyz":[1.7377,-0.7409,0.8076]},{"ar":"\u062a\u0644\u0633","latin":"t-l-s","cat":3,"xyz":[-1.8073,-0.7558,0.3142]},{"ar":"\u062a\u0644\u0635","latin":"t-l-S","cat":0,"xyz":[1.0796,-0.8288,-1.5289]},{"ar":"\u062a\u0644\u0632","latin":"t-l-z","cat":3,"xyz":[0.206,-1.1837,1.679]},{"ar":"\u062a\u0644\u0634","latin":"t-l-sh","cat":3,"xyz":[-1.3516,-1.0578,-1.0139]},{"ar":"\u062a\u0644\u062e","latin":"t-l-kh","cat":3,"xyz":[1.6216,-1.0268,-0.0444]},{"ar":"\u062a\u0644\u063a","latin":"t-l-gh","cat":3,"xyz":[-1.1137,-1.1401,1.2924]},{"ar":"\u062a\u0644\u062d","latin":"t-l-H","cat":1,"xyz":[0.0957,-1.1373,-1.6571]},{"ar":"\u062a\u0644\u0647","latin":"t-l-h","cat":1,"xyz":[1.0767,-1.1405,1.3023]},{"ar":"\u062a\u0644\u0639","latin":"t-l-3","cat":1,"xyz":[-1.6667,-1.117,-0.1834]},{"ar":"\u062a\u0644\u0646","latin":"t-l-n","cat":3,"xyz":[1.4735,-1.2587,-0.7469]},{"ar":"\u062a\u0644\u0644","latin":"t-l-l","cat":3,"xyz":[-0.5237,-1.2054,1.6094]},{"ar":"\u062a\u0644\u0631","latin":"t-l-r","cat":3,"xyz":[-0.7494,-1.2767,-1.3947]},{"ar":"\u062a\u0644\u0648","latin":"t-l-w","cat":2,"xyz":[1.4352,-1.3077,0.5543]},{"ar":"\u062a\u0644\u064a","latin":"t-l-y","cat":2,"xyz":[-1.3619,-1.3496,0.698]},{"ar":"\u062a\u0644\u062c","latin":"t-l-j","cat":3,"xyz":[0.6155,-1.2627,-1.3237]},{"ar":"\u0637\u0628\u0645","latin":"T-b-m","cat":0,"xyz":[0.4161,-1.4062,1.4433]},{"ar":"\u0637\u0643\u0645","latin":"T-k-m","cat":0,"xyz":[-1.2133,-1.3966,-0.6697]},{"ar":"\u0637\u0642\u0645","latin":"T-q-m","cat":0,"xyz":[1.4591,-1.4759,-0.2998]},{"ar":"\u0637\u0621\u0645","latin":"T-'-m","cat":0,"xyz":[-0.7653,-1.4796,1.2284]},{"ar":"\u0637\u0641\u0645","latin":"T-f-m","cat":0,"xyz":[-0.1461,-1.4307,-1.2061]},{"ar":"\u0637\u0633\u0645","latin":"T-s-m","cat":0,"xyz":[1.0129,-1.4749,0.7742]},{"ar":"\u0637\u0632\u0645","latin":"T-z-m","cat":0,"xyz":[-1.2185,-1.5734,0.0986]},{"ar":"\u0637\u0634\u0645","latin":"T-sh-m","cat":0,"xyz":[0.8741,-1.6621,-0.7087]},{"ar":"\u0637\u062e\u0645","latin":"T-kh-m","cat":0,"xyz":[-0.0974,-1.7274,1.2511]},{"ar":"\u0637\u063a\u0645","latin":"T-gh-m","cat":0,"xyz":[-0.6742,-1.6139,-0.7789]},{"ar":"\u0637\u0647\u0645","latin":"T-h-m","cat":0,"xyz":[1.0511,-1.7693,0.1139]},{"ar":"\u0637\u0645\u0645","latin":"T-m-m","cat":0,"xyz":[-0.8579,-1.6531,0.586]},{"ar":"\u0637\u0646\u0645","latin":"T-n-m","cat":0,"xyz":[0.1114,-1.7904,-0.8913]},{"ar":"\u0637\u0631\u0645","latin":"T-r-m","cat":0,"xyz":[0.4138,-1.8641,0.7648]},{"ar":"\u0637\u0648\u0645","latin":"T-w-m","cat":0,"xyz":[-0.7523,-1.8725,-0.2573]},{"ar":"\u0637\u064a\u0645","latin":"T-y-m","cat":0,"xyz":[0.6631,-1.9814,-0.4355]},{"ar":"\u0637\u062c\u0645","latin":"T-j-m","cat":0,"xyz":[-0.2812,-1.9162,0.6107]},{"ar":"\u0637\u0644\u0628","latin":"T-l-b","cat":0,"xyz":[-0.0712,-1.8642,-0.4909]},{"ar":"\u0637\u0644\u062a","latin":"T-l-t","cat":0,"xyz":[0.3269,-2.0466,0.1581]},{"ar":"\u0637\u0644\u062f","latin":"T-l-d","cat":0,"xyz":[-0.0231,-1.9742,-0.0662]}],"vides":[{"ar":"\u0644\u0644\u0645","latin":"l-l-m","pos":0,"xyz":[0.1352,0.8127,0.0026]},{"ar":"\u0621\u0621\u0645","latin":"'-'-m","pos":1,"xyz":[-0.5102,0.3619,0.4974]},{"ar":"\u0621\u0647\u0645","latin":"'-h-m","pos":1,"xyz":[0.0742,-0.1404,-0.7653]},{"ar":"\u0621\u0639\u0645","latin":"'-3-m","pos":1,"xyz":[0.4959,-0.475,0.5705]},{"ar":"\u0621\u0644\u0639","latin":"'-l-3","pos":2,"xyz":[0.0404,-0.8709,-0.0194]}]};
+const C=D.centre, V1=D.v1, V2=D.v2, VD=D.vides;
+const CC=['#e63946','#f4a261','#2dd4bf','#4a9eff'];
+const CL=['Emphatique','Gutturale','Faible (w/y)','Saine'];
+const PL=['C1 changée','C2 changée','C3 changée'];
+
+const cvs=document.getElementById('cvs');
+const ctx=cvs.getContext('2d');
+let W,H;
+function rsz(){W=cvs.width=cvs.offsetWidth;H=cvs.height=cvs.offsetHeight;}
+rsz(); window.addEventListener('resize',()=>{rsz();});
+
+let rX=0.3,rY=0.5,zm=1.1,autoRot=true,spd=1,ptSz=5,ptOp=.88,showAx=true;
+const vis=[true,true,true,true,true,true];
+let pulse=0;
+
+function proj(x,y,z){
+  let cx=x*Math.cos(rY)+z*Math.sin(rY);
+  let cz=-x*Math.sin(rY)+z*Math.cos(rY);
+  let cy=y*Math.cos(rX)-cz*Math.sin(rX);
+  let cz2=y*Math.sin(rX)+cz*Math.cos(rX);
+  const f=3.5*zm,d=f/(f+cz2+2.5);
+  const s=Math.min(W,H)*0.2;
+  return {sx:W/2+cx*d*s,sy:H/2-cy*d*s,d,z:cz2};
+}
+
+function hexRGB(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+
+// Dessiner sphère filaire
+function drawSphere(radius,col,op,nLines=12){
+  ctx.strokeStyle=col.replace(')',','+op+')').replace('rgb','rgba');
+  ctx.lineWidth=.5;
+  for(let i=0;i<nLines;i++){
+    const a=i/nLines*Math.PI*2;
+    // Méridien
+    const pts=[];
+    for(let j=0;j<=32;j++){
+      const b=j/32*Math.PI*2;
+      pts.push(proj(radius*Math.cos(a)*Math.sin(b),radius*Math.cos(b),radius*Math.sin(a)*Math.sin(b)));
+    }
+    ctx.beginPath();
+    pts.forEach((p,k)=>k===0?ctx.moveTo(p.sx,p.sy):ctx.lineTo(p.sx,p.sy));
+    ctx.strokeStyle=`rgba(${col},${op})`;ctx.stroke();
+  }
+  // Équateur
+  const eq=[];
+  for(let j=0;j<=64;j++){
+    const a=j/64*Math.PI*2;
+    eq.push(proj(radius*Math.cos(a),0,radius*Math.sin(a)));
+  }
+  ctx.beginPath();
+  eq.forEach((p,k)=>k===0?ctx.moveTo(p.sx,p.sy):ctx.lineTo(p.sx,p.sy));
+  ctx.strokeStyle=`rgba(${col},${op*1.5})`;ctx.lineWidth=.8;ctx.stroke();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*.7);
+  bg.addColorStop(0,'#060f1c');bg.addColorStop(1,'#020810');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  pulse=(pulse+.04)%(Math.PI*2);
+
+  // Sphères de référence
+  if(vis[5]){
+    drawSphere(1.0,'26,80,140',.12,10);
+    drawSphere(2.0,'26,60,100',.07,8);
+    drawSphere(0.85,'200,60,60',.08,8);
+  }
+
+  // Axes
+  if(showAx){
+    const O=proj(0,0,0);
+    [[2.2,0,0,'#e63946','PC1'],[0,2.2,0,'#22c55e','PC2'],[0,0,2.2,'#4a9eff','PC3']].forEach(([dx,dy,dz,col,lbl])=>{
+      const P=proj(dx,dy,dz),N=proj(-dx*.25,-dy*.25,-dz*.25);
+      ctx.beginPath();ctx.moveTo(O.sx,O.sy);ctx.lineTo(N.sx,N.sy);
+      ctx.strokeStyle=col+'22';ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(O.sx,O.sy);ctx.lineTo(P.sx,P.sy);
+      ctx.strokeStyle=col+'88';ctx.lineWidth=1.5;ctx.stroke();
+      const a=Math.atan2(P.sy-O.sy,P.sx-O.sx);
+      ctx.beginPath();ctx.moveTo(P.sx,P.sy);
+      ctx.lineTo(P.sx-7*Math.cos(a-.4),P.sy-7*Math.sin(a-.4));
+      ctx.lineTo(P.sx-7*Math.cos(a+.4),P.sy-7*Math.sin(a+.4));
+      ctx.closePath();ctx.fillStyle=col;ctx.fill();
+      ctx.fillStyle=col+'cc';ctx.font='bold 10px IBM Plex Mono';ctx.textAlign='center';
+      ctx.fillText(lbl,P.sx+(P.sx-O.sx)*.18,P.sy+(P.sy-O.sy)*.18-3);
+    });
+  }
+
+  // Lignes connexion
+  if(vis[4]){
+    const cP=proj(0,0,0);
+    V1.forEach(v=>{
+      const vP=proj(v.xyz[0],v.xyz[1],v.xyz[2]);
+      const [r,g,b]=hexRGB(CC[v.cat]);
+      ctx.beginPath();ctx.moveTo(cP.sx,cP.sy);ctx.lineTo(vP.sx,vP.sy);
+      ctx.strokeStyle=`rgba(${r},${g},${b},0.12)`;ctx.lineWidth=.7;ctx.stroke();
+    });
+  }
+
+  // Collecter et trier tous les points par z
+  const allPts=[];
+  if(vis[2]) V2.forEach(v=>allPts.push({t:'v2',v}));
+  if(vis[1]) V1.forEach(v=>allPts.push({t:'v1',v}));
+  if(vis[3]) VD.forEach(v=>allPts.push({t:'vd',v}));
+  if(vis[0]) allPts.push({t:'ctr'});
+
+  allPts.sort((a,b)=>{
+    const za=a.t==='ctr'?proj(0,0,0).z:proj(a.v.xyz[0],a.v.xyz[1],a.v.xyz[2]).z;
+    const zb=b.t==='ctr'?proj(0,0,0).z:proj(b.v.xyz[0],b.v.xyz[1],b.v.xyz[2]).z;
+    return za-zb;
+  });
+
+  allPts.forEach(({t,v})=>{
+    if(t==='v2'){
+      const p=proj(v.xyz[0],v.xyz[1],v.xyz[2]);
+      const [r,g,b]=hexRGB(CC[v.cat]);
+      ctx.beginPath();ctx.arc(p.sx,p.sy,ptSz*.5*p.d,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${r},${g},${b},${ptOp*.28})`;ctx.fill();
+    }
+    else if(t==='v1'){
+      const p=proj(v.xyz[0],v.xyz[1],v.xyz[2]);
+      const [r,g,b]=hexRGB(CC[v.cat]);
+      // Halo
+      const grd=ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,ptSz*2.5*p.d);
+      grd.addColorStop(0,`rgba(${r},${g},${b},${ptOp*.4})`);
+      grd.addColorStop(1,`rgba(${r},${g},${b},0)`);
+      ctx.beginPath();ctx.arc(p.sx,p.sy,ptSz*2.5*p.d,0,Math.PI*2);
+      ctx.fillStyle=grd;ctx.fill();
+      ctx.beginPath();ctx.arc(p.sx,p.sy,ptSz*.9*p.d,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${r},${g},${b},${ptOp})`;ctx.fill();
+    }
+    else if(t==='vd'){
+      const p=proj(v.xyz[0],v.xyz[1],v.xyz[2]);
+      // Halo rouge
+      const grd=ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,ptSz*3*p.d);
+      grd.addColorStop(0,`rgba(230,57,70,${ptOp*.5})`);
+      grd.addColorStop(1,`rgba(230,57,70,0)`);
+      ctx.beginPath();ctx.arc(p.sx,p.sy,ptSz*3*p.d,0,Math.PI*2);
+      ctx.fillStyle=grd;ctx.fill();
+      ctx.beginPath();ctx.arc(p.sx,p.sy,ptSz*.8*p.d,0,Math.PI*2);
+      ctx.fillStyle=`rgba(230,57,70,${ptOp})`;ctx.fill();
+      // Croix ×
+      const s=ptSz*1.2*p.d;
+      ctx.strokeStyle='rgba(255,100,110,0.9)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(p.sx-s,p.sy-s);ctx.lineTo(p.sx+s,p.sy+s);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p.sx+s,p.sy-s);ctx.lineTo(p.sx-s,p.sy+s);ctx.stroke();
+    }
+    else if(t==='ctr'){
+      const cP=proj(0,0,0);
+      // Anneaux pulsants
+      [1.8,2.8,4].forEach((m,i)=>{
+        const rad=(ptSz*m+Math.sin(pulse+i)*(ptSz*.4))*cP.d;
+        ctx.beginPath();ctx.arc(cP.sx,cP.sy,rad,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(201,168,76,${(.25-i*.07)+Math.sin(pulse)*.06})`;
+        ctx.lineWidth=1.5-i*.3;ctx.stroke();
+      });
+      // Point central doré
+      const grd=ctx.createRadialGradient(cP.sx,cP.sy,0,cP.sx,cP.sy,ptSz*3.5*cP.d);
+      grd.addColorStop(0,'rgba(240,208,128,0.95)');
+      grd.addColorStop(.5,'rgba(201,168,76,0.6)');
+      grd.addColorStop(1,'rgba(201,168,76,0)');
+      ctx.beginPath();ctx.arc(cP.sx,cP.sy,ptSz*3.5*cP.d,0,Math.PI*2);
+      ctx.fillStyle=grd;ctx.fill();
+      ctx.beginPath();ctx.arc(cP.sx,cP.sy,ptSz*1.6*cP.d,0,Math.PI*2);
+      ctx.fillStyle='rgba(240,208,128,1)';ctx.fill();
+      // Label ءلم
+      ctx.fillStyle='rgba(240,208,128,0.95)';
+      ctx.font=`bold ${Math.round(14*cP.d)}px Cinzel`;ctx.textAlign='center';
+      ctx.fillText('ءلم',cP.sx,cP.sy-ptSz*2.5*cP.d-6);
+    }
+  });
+}
+
+// Loop
+(function loop(){if(autoRot)rY+=.004*spd;draw();requestAnimationFrame(loop);})();
+
+// Mouse / Touch
+let drag=false,lx=0,ly=0;
+cvs.addEventListener('mousedown',e=>{drag=true;lx=e.clientX;ly=e.clientY;autoRot=false;document.getElementById('tRot').classList.remove('on');});
+window.addEventListener('mouseup',()=>drag=false);
+window.addEventListener('mousemove',e=>{
+  if(drag){rY+=(e.clientX-lx)*.009;rX+=(e.clientY-ly)*.009;
+    rX=Math.max(-1.4,Math.min(1.4,rX));lx=e.clientX;ly=e.clientY;}
+  hover(e);
+});
+cvs.addEventListener('wheel',e=>{e.preventDefault();zm=Math.max(.3,Math.min(7,zm*(1-e.deltaY*.001)));},{passive:false});
+cvs.addEventListener('dblclick',()=>{rX=.3;rY=.5;zm=1.1;autoRot=true;document.getElementById('tRot').classList.add('on');});
+cvs.addEventListener('touchstart',e=>{e.preventDefault();drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;autoRot=false;},{passive:false});
+window.addEventListener('touchend',()=>drag=false);
+window.addEventListener('touchmove',e=>{if(drag){rY+=(e.touches[0].clientX-lx)*.009;rX+=(e.touches[0].clientY-ly)*.009;lx=e.touches[0].clientX;ly=e.touches[0].clientY;}},{passive:false});
+
+// Nearest
+function nearest(mx,my){
+  let best=null,bd=26,type=null;
+  const all=[...V1.map(v=>({v,t:'v1'})),...V2.map(v=>({v,t:'v2'})),...VD.map(v=>({v,t:'vd'}))];
+  all.forEach(({v,t})=>{
+    const p=proj(v.xyz[0],v.xyz[1],v.xyz[2]);
+    const d=Math.hypot(p.sx-mx,p.sy-my);
+    if(d<bd){bd=d;best=v;type=t;}
+  });
+  return {best,type};
+}
+
+const tt=document.getElementById('tt');
+function hover(e){
+  const rect=cvs.getBoundingClientRect();
+  const {best,type}=nearest(e.clientX-rect.left,e.clientY-rect.top);
+  if(best){
+    const col=type==='vd'?'#e63946':CC[best.cat]||'#4a9eff';
+    tt.style.cssText='display:block;left:'+(e.clientX+14)+'px;top:'+(e.clientY-10)+'px;border-color:'+col;
+    document.getElementById('ttAr').textContent=best.ar;
+    document.getElementById('ttLat').textContent=best.latin.toUpperCase();
+    document.getElementById('ttCat').textContent=
+      type==='vd'?'⛔ Zone vide interdite':
+      type==='v1'?'Voisine directe (dist=1)':'Voisine éloignée (dist=2)';
+  } else tt.style.display='none';
+}
+
+cvs.addEventListener('click',e=>{
+  const rect=cvs.getBoundingClientRect();
+  const {best,type}=nearest(e.clientX-rect.left,e.clientY-rect.top);
+  if(!best)return;
+  document.getElementById('vcard').classList.add('on');
+  document.getElementById('vcAr').textContent=best.ar;
+  document.getElementById('vcLat').textContent=best.latin.toUpperCase();
+  let info='';
+  if(type==='vd'){
+    info='⛔ Zone vide interdite\nPosition : '+PL[best.pos]+'\nCette forme viole une\ncontrainte phonologique';
+  } else if(type==='v1'){
+    info='Voisine directe (dist=1)\nCatégorie : '+CL[best.cat]+'\nPosition : '+PL[best.pos];
+  } else {
+    info='Voisine éloignée (dist=2)\nCatégorie : '+CL[best.cat]+'\n2 substitutions depuis ءلم';
+  }
+  document.getElementById('vcInfo').textContent=info;
+});
+
+function tV(i){vis[i]=!vis[i];document.getElementById('lg'+i).classList.toggle('off');}
+</script>
+</body>
+</html>
